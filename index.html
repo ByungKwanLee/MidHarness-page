@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mid-Harness: Scaling Actions Between Model and Harness for Terminal Agents</title>
+  <meta name="description" content="Mid-Harness samples and verifies candidate actions at the model–harness boundary of terminal agents before one is executed. With a GPT-5.6 Sol verifier, TMAX-9B Pass@1 on TerminalBench-Lite rises from 50.00% to 68.03%; the generator is not trained and the harness is unchanged.">
+  <meta name="author" content="Minki Kang, Ryo Hachiuma, Shaokun Zhang, Subhashree Radhakrishnan, Yonggan Fu, Jindong Jiang, Mingjie Liu, Ehsan Hosseini-Asl, Yi Dong, Yu-Chiang Frank Wang, Byung-Kwan Lee">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fbfbf8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+
+  <!-- Link previews (messengers, social). Replace the image URL with an absolute URL once the page is deployed. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="NVIDIA Research">
+  <meta property="og:title" content="Mid-Harness: Scaling Actions Between Model and Harness for Terminal Agents">
+  <meta property="og:description" content="Sample several candidate actions, verify them, and execute only one — at the boundary between model and harness. 50.00% → 68.03% Pass@1 on TerminalBench-Lite; the TMAX-9B generator is not trained.">
+  <meta property="og:image" content="assets/img/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Mid-Harness: a verifier picks pytest among sampled terminal commands before execution.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mid-Harness: Scaling Actions Between Model and Harness for Terminal Agents">
+  <meta name="twitter:description" content="Sample, verify, and execute one action at the model–harness boundary. 50.00% → 68.03% Pass@1 on TerminalBench-Lite.">
+  <meta name="twitter:image" content="assets/img/og-image.png">
+
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preconnect" href="https://images.nvidia.com" crossorigin>
+  <link rel="preload" href="https://images.nvidia.com/etc/designs/nvidiaGDC/clientlibs_base/fonts/nvidia-sans/NALA/var/NVIDIASansVF_NALA_W_Wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929r">
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var theme = (/[?&]theme=(light|dark)\b/.exec(location.search) || [])[1];
+      if (!theme) {
+        try { theme = localStorage.getItem('mh-theme'); } catch (e) {}
+      }
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      root.setAttribute('data-theme', theme);
+      root.classList.add('js');
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ================= Header ================= -->
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Mid-Harness, back to top">
+        <span class="nv-lockup" aria-hidden="true">
+          <svg class="nv-eye" viewBox="0 0 24 24"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.33 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.73 1.245-2.73 1.245s.68 2.412 2.739 3.11M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.42v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg>
+          <svg class="nv-word" viewBox="316.2 33.8 630.2 118.2"><path fill="currentColor" d="M578.2 34v118h33.3V34h-33.3zm-262-.2v118.1h33.6V60.2l26.2.1c8.6 0 14.6 2.1 18.7 6.5 5.3 5.6 7.4 14.7 7.4 31.2v53.9h32.6V86.7c0-46.6-29.7-52.9-58.7-52.9h-59.8zm315.7.2v118h54c28.8 0 38.2-4.8 48.3-15.5 7.2-7.5 11.8-24.1 11.8-42.2 0-16.6-3.9-31.4-10.8-40.6C723 37.2 705.2 34 678.6 34h-46.7zm33 25.6h14.3c20.8 0 34.2 9.3 34.2 33.5s-13.4 33.6-34.2 33.6h-14.3V59.6zM530.2 34l-27.8 93.5L475.8 34h-36l38 118h48l38.4-118h-34zm231.4 118h33.3V34h-33.3v118zM855 34l-46.5 117.9h32.8l7.4-20.9h55l7 20.8h35.7L899.5 34H855zm21.6 21.5l20.2 55.2h-41l20.8-55.2z"/></svg>
+        </span>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-name">Mid-Harness</span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Sections">
+        <a href="#tldr">TL;DR</a>
+        <a href="#method">How it works</a>
+        <a href="#results">Results</a>
+        <a href="#scaling">Scaling</a>
+        <a href="#analysis">Analysis</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" type="button" id="theme-toggle" aria-label="Switch to dark mode">
+          <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+        </button>
+        <button class="icon-btn menu-toggle" type="button" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg class="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mobile-menu" id="mobile-menu" aria-label="Sections" hidden>
+      <a href="#tldr">TL;DR</a>
+      <a href="#method">How it works <span>01</span></a>
+      <a href="#results">Results <span>02</span></a>
+      <a href="#scaling">Scaling <span>03</span></a>
+      <a href="#analysis">Analysis <span>04</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ================= Hero ================= -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-inner crop">
+          <p class="kicker">Terminal agents · Agent harness · Test-time scaling</p>
+          <h1 class="mega hero-title" id="hero-title"><span class="nv">Mid</span><span class="dash">-</span>Harness</h1>
+          <p class="hero-sub">Scaling Actions Between Model and Harness for Terminal Agents</p>
+
+          <p class="authors">
+            <span><a href="https://nardien.github.io/" target="_blank" rel="noopener">Minki Kang</a><sup>1,2<span class="note-mark ast">*</span></sup></span>
+            <span><a href="https://ryohachiuma.github.io/" target="_blank" rel="noopener">Ryo Hachiuma</a><sup>1</sup></span>
+            <span><a href="https://skzhang1.github.io/" target="_blank" rel="noopener">Shaokun Zhang</a><sup>1</sup></span>
+            <span><a href="https://subhashree-r.github.io/" target="_blank" rel="noopener">Subhashree Radhakrishnan</a><sup>1</sup></span>
+            <span><a href="https://www.yongganfu.com/" target="_blank" rel="noopener">Yonggan Fu</a><sup>1</sup></span>
+            <span><a href="https://www.jindongjiang.me/" target="_blank" rel="noopener">Jindong Jiang</a><sup>1</sup></span>
+            <span><a href="https://research.nvidia.com/person/mingjie-liu" target="_blank" rel="noopener">Mingjie Liu</a><sup>1</sup></span>
+            <span><a href="https://ehosseiniasl.github.io/new_website/" target="_blank" rel="noopener">Ehsan Hosseini-Asl</a><sup>1</sup></span>
+            <span><a href="https://yidong72.github.io/" target="_blank" rel="noopener">Yi Dong</a><sup>1</sup></span>
+            <span><a href="https://vllab.ee.ntu.edu.tw/ycwang.html" target="_blank" rel="noopener">Yu-Chiang Frank Wang</a><sup>1</sup></span>
+            <span><a href="https://byungkwanlee.github.io/ByungKwanLee-CV/" target="_blank" rel="noopener">Byung-Kwan Lee</a><sup>1<span class="note-mark dag">†</span></sup></span>
+          </p>
+          <p class="affils">
+            <span><sup>1</sup>NVIDIA</span>
+            <span><sup>2</sup>KAIST</span>
+          </p>
+          <p class="affil-notes">
+            <strong><sup class="ast">*</sup>Work done during internship</strong>
+            <strong><sup class="dag">†</sup>Project lead</strong>
+          </p>
+
+          <div class="hero-links">
+            <a class="pill" href="#" data-link="arxiv">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+              ArXiv
+            </a>
+            <a class="pill" href="#" data-link="code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/></svg>
+              Code
+            </a>
+          </div>
+        </div>
+      </div>
+      <span class="edge edge-l" aria-hidden="true">∵ ×</span>
+      <span class="edge edge-r" aria-hidden="true">× ∵</span>
+    </section>
+
+    <!-- ================= Headline results ================= -->
+    <section class="hype" id="headline" aria-labelledby="hype-title">
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          <span>TerminalBench-Lite <i>/</i> Nemotron3.5 Lightning <i>/</i> Pass@1 <b>▲ +2.04</b></span>
+          <span>Terminal-Bench 2.1 <i>/</i> Nemotron3 Ultra <i>/</i> Pass@1 <b>▲ +5.24</b></span>
+          <span>TerminalBench-Lite <i>/</i> Qwen3.5-9B <i>/</i> Pass@1 <b>▲ +2.04</b></span>
+          <span>SWE-bench-Verified <i>/</i> TMAX-9B <i>/</i> Pass@1 <b>▲ +2.00</b></span>
+          <span>TerminalBench-Lite <i>/</i> Nemotron3.5 Lightning <i>/</i> Pass@3 <b>▲ +3.06</b></span>
+          <span>Terminal-Bench 2.1 <i>/</i> Nemotron3 Ultra <i>/</i> Pass@3 <b>▲ +1.12</b></span>
+          <span>TerminalBench-Lite <i>/</i> Qwen3.5-9B <i>/</i> Pass@3 <b>▲ +1.02</b></span>
+          <span>SWE-bench-Verified <i>/</i> TMAX-9B <i>/</i> Pass@3 <b>▲ +8.00</b></span>
+          <span>TerminalBench-Lite <i>/</i> Nemotron3.5 Lightning <i>/</i> Pass@1 <b>▲ +2.04</b></span>
+          <span>Terminal-Bench 2.1 <i>/</i> Nemotron3 Ultra <i>/</i> Pass@1 <b>▲ +5.24</b></span>
+          <span>TerminalBench-Lite <i>/</i> Qwen3.5-9B <i>/</i> Pass@1 <b>▲ +2.04</b></span>
+          <span>SWE-bench-Verified <i>/</i> TMAX-9B <i>/</i> Pass@1 <b>▲ +2.00</b></span>
+          <span>TerminalBench-Lite <i>/</i> Nemotron3.5 Lightning <i>/</i> Pass@3 <b>▲ +3.06</b></span>
+          <span>Terminal-Bench 2.1 <i>/</i> Nemotron3 Ultra <i>/</i> Pass@3 <b>▲ +1.12</b></span>
+          <span>TerminalBench-Lite <i>/</i> Qwen3.5-9B <i>/</i> Pass@3 <b>▲ +1.02</b></span>
+          <span>SWE-bench-Verified <i>/</i> TMAX-9B <i>/</i> Pass@3 <b>▲ +8.00</b></span>
+        </div>
+      </div>
+
+      <div class="container">
+        <header class="hype-head reveal">
+          <p class="kicker">Headline results</p>
+          <h2 class="hype-title" id="hype-title">
+            <span class="hype-pre">Same model. Same harness.</span>
+            <span class="mega hype-big">Every score goes <em>up.</em></span>
+          </h2>
+        </header>
+
+        <div class="board-wrap reveal">
+          <table class="board" role="table">
+            <caption class="visually-hidden">Pass@1 and Pass@3 (%) of the base agent and Mid-Harness in four transfer settings</caption>
+            <thead role="rowgroup">
+              <tr role="row">
+                <th role="columnheader" scope="col">Benchmark</th>
+                <th role="columnheader" scope="col">Agent<span>model × harness · verifier</span></th>
+                <th role="columnheader" scope="col">Pass@1<span>base → Mid-Harness</span></th>
+                <th role="columnheader" scope="col">Pass@3<span>base → Mid-Harness</span></th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              <tr role="row" data-count-group>
+                <th role="rowheader" scope="row" class="b-bench">TerminalBench-Lite</th>
+                <td role="cell" class="b-agent"><div class="agent"><b>Nemotron3.5 Lightning</b><span class="sz">30B</span><span class="x" aria-hidden="true">×</span><span>Terminus-2</span><span class="vt zs">zero-shot</span></div></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@1</span><span class="gain">+<span data-count="2.04" data-decimals="2" data-duration="2200" data-delay="0">2.04</span><small>pp</small></span><span class="ba">41.16 <i>→</i> <span data-count="43.20" data-from="41.16" data-decimals="2" data-duration="2200" data-delay="0">43.20</span></span></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@3</span><span class="gain">+<span data-count="3.06" data-decimals="2" data-duration="2200" data-delay="90">3.06</span><small>pp</small></span><span class="ba">55.10 <i>→</i> <span data-count="58.16" data-from="55.10" data-decimals="2" data-duration="2200" data-delay="90">58.16</span></span></td>
+              </tr>
+              <tr role="row" data-count-group>
+                <th role="rowheader" scope="row" class="b-bench">Terminal-Bench 2.1</th>
+                <td role="cell" class="b-agent"><div class="agent"><b>Nemotron3 Ultra</b><span class="sz">550B</span><span class="x" aria-hidden="true">×</span><span>Terminus-2</span><span class="vt zs">zero-shot</span></div></td>
+                <td role="cell" class="b-metric peak"><span class="m-lab" aria-hidden="true">Pass@1</span><span class="gain">+<span data-count="5.24" data-decimals="2" data-duration="2200" data-delay="150">5.24</span><small>pp</small></span><span class="ba">50.94 <i>→</i> <span data-count="56.18" data-from="50.94" data-decimals="2" data-duration="2200" data-delay="150">56.18</span></span></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@3</span><span class="gain">+<span data-count="1.12" data-decimals="2" data-duration="2200" data-delay="240">1.12</span><small>pp</small></span><span class="ba">65.17 <i>→</i> <span data-count="66.29" data-from="65.17" data-decimals="2" data-duration="2200" data-delay="240">66.29</span></span></td>
+              </tr>
+              <tr role="row" data-count-group>
+                <th role="rowheader" scope="row" class="b-bench">TerminalBench-Lite</th>
+                <td role="cell" class="b-agent"><div class="agent"><b>Qwen3.5-9B</b><span class="x" aria-hidden="true">×</span><span>Terminus-2</span><span class="vt zs">zero-shot</span></div></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@1</span><span class="gain">+<span data-count="2.04" data-decimals="2" data-duration="2200" data-delay="300">2.04</span><small>pp</small></span><span class="ba">40.48 <i>→</i> <span data-count="42.52" data-from="40.48" data-decimals="2" data-duration="2200" data-delay="300">42.52</span></span></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@3</span><span class="gain">+<span data-count="1.02" data-decimals="2" data-duration="2200" data-delay="390">1.02</span><small>pp</small></span><span class="ba">60.20 <i>→</i> <span data-count="61.22" data-from="60.20" data-decimals="2" data-duration="2200" data-delay="390">61.22</span></span></td>
+              </tr>
+              <tr role="row" data-count-group>
+                <th role="rowheader" scope="row" class="b-bench">SWE-bench-Verified<small>Mini · 50 tasks</small></th>
+                <td role="cell" class="b-agent"><div class="agent"><b>TMAX-9B</b><span class="x" aria-hidden="true">×</span><span>Vanillux2</span><span class="vt dist">distilled</span></div></td>
+                <td role="cell" class="b-metric"><span class="m-lab" aria-hidden="true">Pass@1</span><span class="gain">+<span data-count="2.00" data-decimals="2" data-duration="2200" data-delay="450">2.00</span><small>pp</small></span><span class="ba">46.67 <i>→</i> <span data-count="48.67" data-from="46.67" data-decimals="2" data-duration="2200" data-delay="450">48.67</span></span></td>
+                <td role="cell" class="b-metric peak"><span class="m-lab" aria-hidden="true">Pass@3</span><span class="gain">+<span data-count="8.00" data-decimals="2" data-duration="2200" data-delay="540">8.00</span><small>pp</small></span><span class="ba">54.00 <i>→</i> <span data-count="62.00" data-from="54.00" data-decimals="2" data-duration="2200" data-delay="540">62.00</span></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="hype-note">Pass@1 / Pass@3 (%) over three runs per task; large numbers are gains over the base agent in percentage points. Mid-Harness uses pairwise verification with N = 8: zero-shot on the Terminus-2 rows (no verifier training; the Nemotron verifiers are the same backbone), distilled on SWE-bench-Verified. <a href="#transfer">All seven transfer settings</a></p>
+      </div>
+    </section>
+
+    <!-- ================= Animated overview ================= -->
+    <section class="stage-section" id="overview" aria-label="Animated overview: base agent versus Mid-Harness">
+      <div class="container">
+        <div class="stage reveal" id="stage" data-active="0">
+          <div class="stage-top">
+            <span class="live"><span>Illustrative · multi-turn<span class="live-tail"> · two agents</span></span></span>
+            <button class="stage-replay" type="button" id="stage-replay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+              Replay
+            </button>
+          </div>
+
+          <div class="stage-task">
+            <span class="st-who"><span class="st-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>User task</span>
+            <p class="st-goal"><span class="visually-hidden">Run this repo's test suite and report whether it passes.</span><span id="stage-goal" aria-hidden="true">Run this repo's test suite and report whether it passes.</span></p>
+          </div>
+          <div class="stage-fork" aria-hidden="true"><i></i><i></i></div>
+
+          <div class="stage-grid">
+            <!-- Base agent -->
+            <article class="lane lane-base" aria-label="Base agent">
+              <div class="lane-bar"><span>base agent</span><span class="tag">1 sample</span></div>
+              <div class="lane-body">
+                <p class="lturn"><b>t2</b>in detail</p>
+                <ol class="lsteps">
+                  <li class="lstep" data-step="1">
+                    <span class="lstep-num">01</span>
+                    <div>
+                      <div class="lstep-head"><b>Sample</b><span class="mono"><i>π</i>(·|h<sub class="ht">t</sub>) × 1</span></div>
+                      <div class="chips"><span class="chip" style="--i:0"><span class="ps">$</span>npm test</span></div>
+                    </div>
+                  </li>
+                  <li class="lstep" data-step="2">
+                    <span class="lstep-num">02</span>
+                    <div>
+                      <div class="lstep-head"><b>Verify</b><span class="mono">skipped</span></div>
+                      <p class="no-verify">The first sample goes straight to the harness.</p>
+                    </div>
+                  </li>
+                  <li class="lstep" data-step="3">
+                    <span class="lstep-num">03</span>
+                    <div>
+                      <div class="lstep-head"><b>Execute</b><span class="mono">harness → environment</span></div>
+                      <div class="exec-row"><span class="chip"><span class="ps">$</span>npm test</span><span class="arrow">→ runs in the env</span></div>
+                    </div>
+                  </li>
+                </ol>
+                <div class="term" aria-hidden="true">
+                  <div class="term-line" data-turn="1" data-prompt="agent$"><span class="ps">agent$</span> ls</div>
+                  <div class="term-line">src/  tests/  pyproject.toml  pytest.ini</div>
+                  <div class="term-line" data-turn="2" data-type="npm test" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="2" data-type="npm error code ENOENT"></div>
+                  <div class="term-line err" data-turn="2" data-type="npm error Could not read package.json"></div>
+                  <div class="term-line" data-turn="3" data-type="echo FAIL" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="3" data-type="FAIL"></div>
+                </div>
+                <span class="lane-status">✗ Error compounds · wrong report</span>
+              </div>
+            </article>
+
+            <!-- Mid-Harness -->
+            <article class="lane lane-mid" aria-label="Mid-Harness">
+              <div class="lane-bar"><span>mid-harness</span><span class="tag">N = 8 → verify → 1</span></div>
+              <div class="lane-body">
+                <p class="lturn"><b>t2</b>in detail</p>
+                <ol class="lsteps">
+                  <li class="lstep" data-step="1">
+                    <span class="lstep-num">01</span>
+                    <div>
+                      <div class="lstep-head"><b>Sample</b><span class="mono"><i>π</i>(·|h<sub class="ht">t</sub>) × 8</span></div>
+                      <div class="chips" id="stage-cands"></div>
+                    </div>
+                  </li>
+                  <li class="lstep" data-step="2">
+                    <span class="lstep-num">02</span>
+                    <div>
+                      <div class="lstep-head"><b>Verify</b><span class="mono"><i>ψ</i> <span id="stage-duel">8 ring + 16 pivot duels</span>, before execution</span></div>
+                      <div class="standings" id="stage-standings"></div>
+                    </div>
+                  </li>
+                  <li class="lstep" data-step="3">
+                    <span class="lstep-num">03</span>
+                    <div>
+                      <div class="lstep-head"><b>Execute one</b><span class="mono">others discarded</span></div>
+                      <div class="exec-row"><span class="chip"><span class="ps">$</span>pytest</span><span class="arrow">→ runs in the env</span></div>
+                    </div>
+                  </li>
+                </ol>
+                <div class="term" aria-hidden="true">
+                  <div class="term-line vd" data-turn="1" data-prompt="agent$" data-badge><span class="ps">agent$</span> ls</div>
+                  <div class="term-line">src/  tests/  pyproject.toml  pytest.ini</div>
+                  <div class="term-line" data-turn="2" data-type="pytest" data-prompt="agent$" data-badge></div>
+                  <div class="term-line dim" data-turn="2" data-type="collected 12 items"></div>
+                  <div class="term-line ok" data-turn="2" data-type="========= 12 passed in 0.84s ========="></div>
+                  <div class="term-line" data-turn="3" data-type="echo PASS" data-prompt="agent$" data-badge></div>
+                  <div class="term-line ok" data-turn="3" data-type="PASS"></div>
+                </div>
+                <span class="lane-status">✓ Verified every turn · correct report</span>
+              </div>
+            </article>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TL;DR ================= -->
+    <section class="section band-green crop" id="tldr" aria-labelledby="tldr-title">
+      <div class="container">
+        <header class="section-head tldr-head">
+          <p class="kicker">Findings at a glance</p>
+          <h2 class="mega" id="tldr-title" aria-label="TL;DR"><span class="scramble" aria-hidden="true">TL;DR</span></h2>
+          <p class="beats">
+            <span class="beat" style="--b:0">Sample <i>N</i> actions.</span>
+            <span class="beat" style="--b:1">Verify them.</span>
+            <span class="beat hl" style="--b:2">Run only the best one.</span>
+          </p>
+        </header>
+
+        <div class="cols3">
+          <article class="col">
+            <p class="col-label">Generator coverage</p>
+            <h3>The generator already proposes better actions.</h3>
+            <div class="hbars">
+              <div class="hbar" style="--v:50.00; --d:0"><span class="hbar-label">Base agent</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">50.00</span></div>
+              <div class="hbar hi" style="--v:68.03; --d:1"><span class="hbar-label">+ frontier verifier</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">68.03</span></div>
+            </div>
+            <div class="hbar-axis" aria-hidden="true"><span></span><span class="ticks"><span>45</span><span>60</span><span>75</span></span><span class="pad"></span></div>
+            <p class="col-foot">GPT-5.6 Sol picks among TMAX-9B's own eight candidates — the generator is not trained.</p>
+          </article>
+
+          <article class="col">
+            <p class="col-label">Verification matters</p>
+            <h3>How candidates are compared decides the gain.</h3>
+            <div class="hbars">
+              <div class="hbar" style="--v:51.02; --d:0"><span class="hbar-label">Listwise</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">51.02</span></div>
+              <div class="hbar" style="--v:54.76; --d:1"><span class="hbar-label">Pairwise</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">54.76</span></div>
+              <div class="hbar hi" style="--v:57.14; --d:2"><span class="hbar-label">Distilled pairwise</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">57.14</span></div>
+            </div>
+            <div class="hbar-axis" aria-hidden="true"><span></span><span class="ticks"><span>45</span><span>60</span><span>75</span></span><span class="pad"></span></div>
+            <p class="col-foot">Self-verification with TMAX-9B; distillation from GPT-5.6 Sol trains only the verifier.</p>
+          </article>
+
+          <article class="col">
+            <p class="col-label">Complements trajectory scaling</p>
+            <h3>Action scaling stacks with trajectory scaling.</h3>
+            <div class="hbars">
+              <div class="hbar-group">
+                <div class="hbar" style="--v:55.10; --d:0"><span class="hbar-label">Best-of-<i>T</i></span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">55.10</span></div>
+                <div class="hbar hi" style="--v:66.33; --d:1"><span class="hbar-label">+ Mid-Harness</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">66.33</span></div>
+              </div>
+              <div class="hbar-group">
+                <div class="hbar" style="--v:55.10; --d:2"><span class="hbar-label">Sequential Refine</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">55.10</span></div>
+                <div class="hbar hi" style="--v:60.20; --d:3"><span class="hbar-label">+ Mid-Harness</span><span class="hbar-track"><span class="hbar-fill"></span></span><span class="hbar-val">60.20</span></div>
+              </div>
+            </div>
+            <div class="hbar-axis" aria-hidden="true"><span></span><span class="ticks"><span>45</span><span>60</span><span>75</span></span><span class="pad"></span></div>
+            <p class="col-foot">Same number of environment runs: Best-of-<i>T</i> with <i>T</i> = 3, SR with <i>R</i> = 1.</p>
+          </article>
+        </div>
+        <p class="band-note">TMAX-9B Pass@1 (%) on TerminalBench-Lite · Mid-Harness uses N = 8 · bars start at 45%</p>
+
+        <article class="tl-spot" aria-labelledby="tl-spot-title">
+          <div class="tl-spot-main">
+            <p class="tl-spot-label">Verification without reasoning</p>
+            <h3 id="tl-spot-title">Verification may <em>not need</em> reasoning.</h3>
+            <p class="tl-spot-sub">A verifier that answers each duel with a single token, <code>A</code> or <code>B</code>, scored higher than one that reasons first, and cost less.</p>
+            <div class="tl-spot-links">
+              <a class="tl-jev" href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" target="_blank" rel="noopener">Same direction as <span class="ts">TypeSafe's</span> <b>Jev</b><span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <div class="race" id="race">
+            <div class="race-head">
+              <p class="race-duel">
+                <span class="race-label">One duel · two verifiers</span>
+                <span class="race-cand"><b>A</b><code>pip install -e .</code></span>
+                <span class="race-vs">vs</span>
+                <span class="race-cand"><b>B</b><code>pytest</code></span>
+              </p>
+              <button class="mech-replay" type="button" id="race-replay">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                Replay
+              </button>
+            </div>
+            <p class="visually-hidden">Schematic: a verifier that writes out its reasoning and a verifier that answers with one token compare the same two actions and pick the same one.</p>
+            <div class="race-viz" aria-hidden="true">
+              <div class="rc-lane rc-think">
+                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>With reasoning</span><span class="rc-count"><b>51</b> <small>tokens</small></span></div>
+                <p class="rc-text">The goal is to run the test suite and report the result. A reinstalls the package in editable mode, which may help later but runs no tests. B runs the suite directly, and pytest.ini shows pytest is already configured. Scores: A 7, B 8. Preference: B</p>
+                <p class="rc-verdict"><b>B</b><code>pytest</code></p>
+                <span class="rc-bar"></span>
+              </div>
+              <div class="rc-lane rc-one">
+                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>One token</span><span class="rc-count"><b>1</b> <small>token</small></span></div>
+                <div class="rc-token"><span class="rc-key">B</span></div>
+                <div class="rc-probs">
+                  <p class="rc-prob"><span>p(A)</span><i style="--p: 0.31"></i><b>0.31</b></p>
+                  <p class="rc-prob is-pick"><span>p(B)</span><i style="--p: 0.69"></i><b>0.69</b></p>
+                </div>
+                <p class="rc-verdict"><b>B</b><code>pytest</code></p>
+                <span class="rc-bar" style="--f: 0.02"></span>
+              </div>
+            </div>
+          </div>
+          <div class="tl-spot-stats" data-count-group>
+            <div class="tl-stat"><b>1<small>token</small></b><span>per duel, no rationale</span></div>
+            <div class="tl-stat"><b><span data-count="59.18" data-from="57.14" data-decimals="2">59.18</span><small>%</small></b><span>Pass@1, up from 57.14% with reasoning</span></div>
+            <div class="tl-stat"><b>−<span data-count="24.1" data-decimals="1">24.1</span><small>%</small></b><span>end-to-end cost</span></div>
+          </div>
+          <p class="tl-spot-note">Distilled TMAX-9B verifier on TerminalBench-Lite, N = 8; at N = 4, the verifier that reasons still scores higher. Duel is schematic.</p>
+        </article>
+      </div>
+      <span class="edge edge-l" aria-hidden="true">∵ ×</span>
+      <span class="edge edge-r" aria-hidden="true">× ∵</span>
+    </section>
+
+    <!-- ================= How it works ================= -->
+    <section class="section crop" id="method" aria-labelledby="method-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">01 · How it works</p>
+          <h2 class="mega" id="method-title">Verify, then act<span class="nv">.</span></h2>
+          <div class="midrail" role="img" aria-label="At every step, the model proposes eight candidate actions; Mid-Harness verifies them mid-step, and only the chosen action reaches the harness.">
+            <div class="mr-node mr-model"><span class="mr-glyph">π</span><b>Propose</b><small>model</small></div>
+            <div class="mr-link mr-in"><svg aria-hidden="true"></svg><span class="mr-tag"><i>a</i><sup>1</sup> … <i>a</i><sup>8</sup></span></div>
+            <div class="mr-node mr-gate"><span class="mr-step">Step <b>1</b></span><span class="mr-glyph">ψ<span class="mr-ring"></span></span><b>Verify</b><small>mid-step</small></div>
+            <div class="mr-link mr-out"><svg aria-hidden="true"></svg><span class="mr-tag"><i>a</i><sup>⋆</sup></span></div>
+            <div class="mr-node mr-harness"><span class="mr-glyph mono-g">&gt;_</span><b>Act</b><small>harness</small></div>
+          </div>
+          <p class="lede">Mid-Harness samples candidates, verifies them, and passes one action to the unchanged harness. The generator is not trained.</p>
+        </header>
+
+        <div class="steps3">
+          <article class="step reveal" style="--rd:0">
+            <p class="step-label">Step 01 · Sample</p>
+            <h4>Draw <i>N</i> candidates</h4>
+            <p>The model proposes several next actions from the same history.</p>
+            <span class="glyph" aria-hidden="true">π</span>
+          </article>
+          <article class="step reveal" style="--rd:1">
+            <p class="step-label">Step 02 · Verify</p>
+            <h4>Compare before running</h4>
+            <p>A verifier checks the candidates and picks one.</p>
+            <span class="glyph" aria-hidden="true">ψ</span>
+          </article>
+          <article class="step reveal" style="--rd:2">
+            <p class="step-label">Step 03 · Execute one</p>
+            <h4>Only the winner runs</h4>
+            <p>The harness executes it; the others are discarded.</p>
+            <span class="glyph mono-g" aria-hidden="true">&gt;_</span>
+          </article>
+        </div>
+
+        <!-- Verification mechanisms -->
+        <div class="mech reveal" id="mech" data-mech="pairwise">
+          <div class="mech-head">
+            <div>
+              <h3>Three ways to verify</h3>
+              <p>Same <i>N</i> candidates, three ways for the verifier <i>ψ</i> to pick one.</p>
+            </div>
+            <div class="mech-ctrl">
+              <div class="seg seg-lg" role="tablist" aria-label="Verification mechanism">
+                <button type="button" role="tab" id="tab-listwise" aria-selected="false" aria-controls="panel-listwise" data-mech-tab="listwise">Listwise</button>
+                <button type="button" role="tab" id="tab-pointwise" aria-selected="false" aria-controls="panel-pointwise" data-mech-tab="pointwise">Pointwise</button>
+                <button type="button" role="tab" id="tab-pairwise" aria-selected="true" aria-controls="panel-pairwise" data-mech-tab="pairwise">Pairwise</button>
+              </div>
+              <button class="mech-replay" type="button" id="mech-replay">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                Replay
+              </button>
+            </div>
+          </div>
+          <div class="mech-sum">
+            <p class="mech-panel" id="panel-listwise" role="tabpanel" aria-labelledby="tab-listwise" hidden>
+              <b>Listwise</b><span>All candidates in one prompt; <i>ψ</i> answers with a single letter.</span>
+              <span class="mech-chips"><span>1 call</span><span>Pass@1 <b>51.02%</b></span></span>
+            </p>
+            <p class="mech-panel" id="panel-pointwise" role="tabpanel" aria-labelledby="tab-pointwise" hidden>
+              <b>Pointwise</b><span>Each candidate is scored alone, 0–10; the top score wins.</span>
+              <span class="mech-chips"><span>8 calls</span><span>Pass@1 <b>52.38%</b></span></span>
+            </p>
+            <p class="mech-panel" id="panel-pairwise" role="tabpanel" aria-labelledby="tab-pairwise">
+              <b>Pairwise</b><span>Ring duels pick 4 pivots, who then face the rest — not all 28 pairs.</span>
+              <span class="mech-chips"><span>22–25 calls</span><span>Pass@1 <b>54.76%</b></span></span>
+            </p>
+          </div>
+          <div class="mech-viz" id="mech-viz" aria-hidden="true"></div>
+        </div>
+        <p class="mech-note reveal">Pass@1 with the TMAX-9B generator and a zero-shot TMAX-9B verifier on TerminalBench-Lite, N = 8. Diagrams are schematic.</p>
+      </div>
+    </section>
+
+    <!-- ================= Results ================= -->
+    <section class="section" id="results" aria-labelledby="results-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">02 · When does action scaling work?</p>
+          <h2 class="mega" id="results-title">Results</h2>
+          <p class="lede">With the TMAX-9B generator and its Vanillux2 harness fixed, we vary candidate width, verification mechanism, and verifier capability on TerminalBench-Lite (98 tasks, three runs each).</p>
+        </header>
+
+        <div class="subhead reveal"><span class="idx">2.1</span><h3>A strong verifier reveals coverage; width alone does not</h3></div>
+        <figure class="chart-card reveal" id="card-width">
+          <div class="chart-head">
+            <div>
+              <p class="chart-kicker">Candidate width · TMAX-9B</p>
+              <h4 class="chart-title">Verification mechanism determines the return from more candidates</h4>
+            </div>
+            <div class="seg" role="group" aria-label="Metric">
+              <button type="button" aria-pressed="true" data-width-metric="pass1">Pass@1</button>
+              <button type="button" aria-pressed="false" data-width-metric="pass3">Pass@3</button>
+            </div>
+          </div>
+          <div class="chart" id="chart-width" role="img" aria-label="Line chart of task success versus candidate width N for listwise, pointwise, zero-shot pairwise, and distilled pairwise verification, with frontier-verifier points at N equals 4 and 8."></div>
+          <div class="legend" id="legend-width"></div>
+          <figcaption><b>N = 1</b> is the base agent without action scaling. The frontier verifier (GPT-5.6 Sol) uses listwise verification because of its cost. × marks a first-runnable-candidate proxy at N = 8.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ================= Scaling ================= -->
+    <section class="section crop" id="scaling" aria-labelledby="scaling-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">03 · Composition and transfer</p>
+          <h2 class="mega" id="scaling-title">Scaling</h2>
+          <p class="lede">Best-of-<i>T</i> and Sequential Refine need fresh environment runs. Mid-Harness improves both without adding any, and its gains carry over to other models, benchmarks, and harnesses.</p>
+        </header>
+
+        <div class="subhead reveal"><span class="idx">3.1</span><h3>Composing action and trajectory scaling</h3></div>
+        <div class="combo reveal" id="combo">
+          <div class="combo-head">
+            <div>
+              <p class="chart-kicker">TerminalBench-Lite · fixed TMAX generators</p>
+              <h4 class="chart-title">Each axis helps; together they help most</h4>
+            </div>
+            <div class="seg" role="group" aria-label="Model size">
+              <button type="button" aria-pressed="false" data-combo-model="m4">TMAX-4B</button>
+              <button type="button" aria-pressed="true" data-combo-model="m9">TMAX-9B</button>
+              <button type="button" aria-pressed="false" data-combo-model="m27">TMAX-27B</button>
+            </div>
+          </div>
+          <div class="combo-grid" id="combo-grid" role="table" aria-label="Pass@1 and Pass@3 for combinations of Best-of-T, Sequential Refine, and Mid-Harness"></div>
+          <p class="combo-foot">Mid-Harness uses pairwise verification (N = 8); Best-of-<i>T</i> uses <i>T</i> = 3 trajectories with the same TMAX model as trajectory verifier; SR uses <i>R</i> = 1 round. Deltas are against the base agent. # Env. counts environment executions per returned output. Best-of-<i>T</i> returns one output, so Pass@3 is undefined.</p>
+        </div>
+
+        <div class="subhead reveal" id="transfer"><span class="idx">3.2</span><h3>Transfer across models, benchmarks, and harnesses</h3></div>
+        <figure class="chart-card reveal" id="card-scale" style="margin-bottom: clamp(20px, 3vw, 32px);">
+          <div class="chart-head">
+            <div>
+              <p class="chart-kicker">Model scale · TerminalBench-Lite</p>
+              <h4 class="chart-title">Action scaling helps from 4B to 27B</h4>
+            </div>
+            <div class="seg" role="group" aria-label="Metric">
+              <button type="button" aria-pressed="true" data-scale-metric="0">Pass@1</button>
+              <button type="button" aria-pressed="false" data-scale-metric="1">Pass@3</button>
+            </div>
+          </div>
+          <div class="chart" id="chart-scale" role="img" aria-label="Line chart of success rate for TMAX-4B, 9B, and 27B generators: base agent, zero-shot Mid-Harness, and distilled Mid-Harness."></div>
+          <div class="legend" id="legend-scale"></div>
+        </figure>
+        <div class="transfer-grid" id="transfer-grid"></div>
+        <p class="transfer-note">Pass@1 / Pass@3 over three runs per task; both Mid-Harness variants use pairwise verification with N = 8. “Best Pass@1 gain” is the larger of the evaluated Mid-Harness variants' gains over the base agent.</p>
+      </div>
+    </section>
+
+    <!-- ================= Analysis ================= -->
+    <section class="section" id="analysis" aria-labelledby="analysis-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">04 · What still limits verification?</p>
+          <h2 class="mega" id="analysis-title">Analysis</h2>
+          <p class="lede">Offline, on 21 held-out tasks, we measure how often pairwise verifiers agree with the GPT-5.6 Sol teacher. This is agreement, not action correctness.</p>
+        </header>
+
+        <div class="duo">
+          <figure class="chart-card reveal" id="card-turn">
+            <div class="chart-head">
+              <div>
+                <p class="chart-kicker">Verification agreement by turn</p>
+                <h4 class="chart-title">Gains persist, but later states stay harder</h4>
+              </div>
+            </div>
+            <div class="chart" id="chart-turn" role="img" aria-label="Line chart of verification agreement with the teacher by episode turn for zero-shot and distilled verifiers."></div>
+            <div class="legend" id="legend-turn"></div>
+            <figcaption>1,355 states with valid comparisons for both models (83.4% of states). The 33+ bin contains only eight tasks.</figcaption>
+          </figure>
+          <figure class="chart-card reveal" id="card-fail" style="--rd:1">
+            <div class="chart-head">
+              <div>
+                <p class="chart-kicker">Clear verifier failures</p>
+                <h4 class="chart-title">Command semantics and feasibility dominate what remains</h4>
+              </div>
+            </div>
+            <div class="chart" id="chart-fail" role="img" aria-label="Horizontal bar chart of clear verifier failure counts by category for zero-shot and distilled verifiers."></div>
+            <div class="legend" id="legend-fail"></div>
+            <figcaption>Teacher disagreements that GPT-5.6 Terra judges clear verifier failures, by category: 3,328 for zero-shot and 1,810 after distillation.</figcaption>
+          </figure>
+        </div>
+
+        <div class="open-prob reveal">
+          <div class="op-main">
+            <p class="op-tag"><span aria-hidden="true"></span>Open problem</p>
+            <h3 class="op-title">Judge a command <em>without running it</em>.</h3>
+            <p class="op-sub">Even after distillation, most clear verifier failures come from misjudging what a command will do in the current environment.</p>
+          </div>
+          <div class="op-stat">
+            <p class="op-num"><span data-count="67.4" data-decimals="1">67.4</span><small>%</small></p>
+            <p class="op-cap">of the distilled verifier's clear failures</p>
+            <div class="op-bar" aria-hidden="true"><span><i style="--w: 39.0"></i><i style="--w: 28.4"></i></span></div>
+            <ul class="op-key">
+              <li><b>39.0%</b> candidate semantics</li>
+              <li><b>28.4%</b> execution feasibility</li>
+            </ul>
+          </div>
+        </div>
+        <div class="op-examples reveal">
+          <article class="op-ex">
+            <p class="op-ex-head">Candidate semantics <b>39.0%</b></p>
+            <p class="op-ex-q">What does this code actually do?</p>
+            <pre class="op-ex-code"><code>token[4] = <mark>'a' + s1</mark>;</code></pre>
+            <p class="op-ex-note">The verifier flagged this as a bug and said it should be <code>s1 + 'a'</code>, but both compute the same letter.</p>
+          </article>
+          <article class="op-ex">
+            <p class="op-ex-head">Execution feasibility <b>28.4%</b></p>
+            <p class="op-ex-q">Can it actually run here?</p>
+            <pre class="op-ex-code"><code>if <mark>'9090'</mark> in cmdline or <mark>'main.go'</mark> in cmdline:
+    os.kill(int(pid), 9)</code></pre>
+            <p class="op-ex-note">The verifier rewarded the port cleanup and persistent launch, missing that it can kill itself first.</p>
+          </article>
+        </div>
+        <p class="op-ex-src">Distilled TMAX-9B verifier vs. the GPT-5.6 Sol reference, offline; from the paper's appendix.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= Footer ================= -->
+  <footer class="site-footer crop">
+    <div class="container">
+      <div class="footer-row">
+        <a class="brand" href="#top" aria-label="Back to top">
+          <span class="nv-lockup" aria-hidden="true">
+            <svg class="nv-eye" viewBox="0 0 24 24"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.124 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851c-.398 0-.787-.062-1.158-.185v-4.346c1.528.185 1.837.857 2.747 2.385l2.04-1.714s-1.492-1.952-4-1.952a6.016 6.016 0 0 0-.796.035m0-4.735v2.138l.424-.027c5.45-.185 9.01 4.47 9.01 4.47s-4.08 4.964-8.33 4.964c-.37 0-.733-.035-1.095-.097v1.325c.3.035.61.062.91.062 3.957 0 6.82-2.023 9.593-4.408.459.371 2.34 1.263 2.73 1.652-2.633 2.208-8.772 3.984-12.253 3.984-.335 0-.653-.018-.971-.053v1.864H24V4.063zm0 10.326v1.131c-3.657-.654-4.673-4.46-4.673-4.46s1.758-1.944 4.673-2.262v1.237H8.94c-1.528-.186-2.73 1.245-2.73 1.245s.68 2.412 2.739 3.11M2.456 10.9s2.164-3.197 6.5-3.533V6.201C4.153 6.59 0 10.653 0 10.653s2.35 6.802 8.948 7.42v-1.237c-4.84-.6-6.492-5.936-6.492-5.936z"/></svg>
+            <svg class="nv-word" viewBox="316.2 33.8 630.2 118.2"><path fill="currentColor" d="M578.2 34v118h33.3V34h-33.3zm-262-.2v118.1h33.6V60.2l26.2.1c8.6 0 14.6 2.1 18.7 6.5 5.3 5.6 7.4 14.7 7.4 31.2v53.9h32.6V86.7c0-46.6-29.7-52.9-58.7-52.9h-59.8zm315.7.2v118h54c28.8 0 38.2-4.8 48.3-15.5 7.2-7.5 11.8-24.1 11.8-42.2 0-16.6-3.9-31.4-10.8-40.6C723 37.2 705.2 34 678.6 34h-46.7zm33 25.6h14.3c20.8 0 34.2 9.3 34.2 33.5s-13.4 33.6-34.2 33.6h-14.3V59.6zM530.2 34l-27.8 93.5L475.8 34h-36l38 118h48l38.4-118h-34zm231.4 118h33.3V34h-33.3v118zM855 34l-46.5 117.9h32.8l7.4-20.9h55l7 20.8h35.7L899.5 34H855zm21.6 21.5l20.2 55.2h-41l20.8-55.2z"/></svg>
+          </span>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <span class="brand-name">Mid-Harness</span>
+        </a>
+        <nav aria-label="Footer">
+          <a href="#" data-link="arxiv">ArXiv</a>
+          <a href="#" data-link="code">Code</a>
+          <a href="https://research.nvidia.com/" target="_blank" rel="noopener">NVIDIA Research</a>
+        </nav>
+        <p>© 2026 NVIDIA Corporation</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="chart-tip" id="chart-tip" role="tooltip"></div>
+
+  <script src="assets/js/data.js?v=20260929r" defer></script>
+  <script src="assets/js/charts.js?v=20260929r" defer></script>
+  <script src="assets/js/main.js?v=20260929r" defer></script>
+</body>
+</html>

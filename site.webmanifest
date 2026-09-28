@@ -1,0 +1,15 @@
+{
+  "name": "Mid-Harness: Scaling Actions Between Model and Harness for Terminal Agents",
+  "short_name": "Mid-Harness",
+  "description": "Sample, verify, and execute one action at the model–harness boundary of terminal agents.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0b0b",
+  "theme_color": "#0b0b0b",
+  "icons": [
+    { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
