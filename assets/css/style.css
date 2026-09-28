@@ -2465,50 +2465,13 @@ html[data-theme="dark"] .race-viz {
 .js .race:not(.probs) .rc-prob i::before { transform: scaleX(0); }
 .js .race:not(.probs) .rc-prob b { opacity: 0; }
 
-/* ---------- Composition: Mid-Harness vs. Best-of-3 ---------- */
-.combo {
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-.combo-head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-  padding: clamp(18px, 2.6vw, 28px) clamp(18px, 2.6vw, 30px) 16px;
-}
-/* One run with Mid-Harness vs. three with Best-of-3; the dashed line marks Best-of-3's score. */
-.eff { position: relative; padding: 4px clamp(18px, 2.6vw, 30px) 20px; }
-.eff-group + .eff-group { margin-top: 18px; }
-.eff-runs { margin: 12px 0 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
-.eff-runs b { margin-right: 5px; font-size: 1.5em; letter-spacing: 0; color: var(--text); }
-.eff-row { display: grid; grid-template-columns: minmax(170px, 30%) minmax(0, 1fr) 58px minmax(150px, 17%); align-items: center; gap: 12px; min-height: 34px; font-size: 14px; }
-.eff-name { color: var(--text-2); line-height: 1.25; }
-.eff-name,
-.eff-vs { position: relative; z-index: 1; }
-.eff-row.zs .eff-name,
-.eff-row.dist .eff-name { color: var(--text); font-weight: 600; }
-.eff-track { position: relative; height: 14px; border-radius: 4px; background: var(--line); }
-.eff-fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--w, 0) * 100%); border-radius: inherit; background: var(--c-base); transition: width 0.8s var(--ease-out); }
-.js .combo:not(.is-in) .eff-fill { width: 0; }
-.eff-row.bot .eff-fill { background: var(--c-bot); }
-.eff-row.zs .eff-fill { background: var(--c-pairwise); }
-.eff-row.dist .eff-fill { background: var(--c-distilled); }
-.eff-val { font-family: var(--font-mono); font-size: 13.5px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-.eff-vs { justify-self: start; padding: 2px 9px; border-radius: 999px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-.eff-vs:empty { display: none; }
-.eff-vs.up { background: var(--green-soft); color: var(--accent); }
-.eff-vs.down { background: var(--line); color: var(--text-3); }
-.eff-axis { min-height: 0; margin-top: 10px; }
-.eff-axis .eff-track { height: 18px; border-radius: 0; background: none; border-top: 1px solid var(--line-2); }
-.eff-axis i { position: absolute; top: 4px; transform: translateX(-50%); font-family: var(--font-mono); font-size: 10.5px; font-style: normal; color: var(--text-3); }
-.eff-ref { position: absolute; width: 0; border-left: 1.5px dashed var(--c-bot); pointer-events: none; transition: left 0.8s var(--ease-out); }
-.eff-ref span { position: absolute; top: 0; left: 6px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; color: var(--c-bot); white-space: nowrap; }
-.combo-foot { padding: 14px clamp(18px, 2.6vw, 30px) 20px; font-size: 0.86rem; color: var(--text-3); border-top: 1px solid var(--line); }
+/* ---------- Cost: Mid-Harness vs. parallel scaling ---------- */
+.mh-chart .anno-arrow .anno-line { stroke: var(--accent); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.mh-chart .anno-arrow .anno { fill: var(--accent); font-size: 13px; font-weight: 700; }
+.cost-wins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.cost-win { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
+.cost-win b { display: block; font-size: clamp(1.35rem, 2.2vw, 1.7rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--accent); }
+.cost-win span { display: block; margin-top: 6px; font-size: 0.88rem; line-height: 1.45; color: var(--text-2); }
 
 /* ---------- Transfer ---------- */
 .transfer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
@@ -2738,7 +2701,7 @@ html[data-theme="dark"] .race-viz {
   .mv-league td.q .t { display: none; }
   .mv-league thead th.qh { padding-left: 4px; font-size: 0; }
   .mv-league thead th.qh::after { content: "q"; font-family: var(--font-math); font-size: 13px; font-style: italic; letter-spacing: 0; text-transform: none; }
-  .chart-card, .combo { border-radius: 18px; }
+  .chart-card { border-radius: 18px; }
   .tl-spot-stats { grid-template-columns: 1fr; gap: 10px; }
   .op-ex-code { white-space: pre-wrap; font-size: 11.5px; }
   .tl-stat { display: flex; align-items: baseline; gap: 12px; }
@@ -2763,12 +2726,7 @@ html[data-theme="dark"] .race-viz {
   .term-line[data-badge]:not(:empty)::after { content: "8→ψ→1"; padding: 0 5px; font-size: 9.5px; }
   .chip { font-size: 12px; height: 28px; padding: 0 8px; }
   .lane-bar { font-size: 17px; }
-  .eff-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 0; padding: 5px 0; font-size: 13.5px; }
-  .eff-name { flex: 1 1 auto; min-width: 0; }
-  .eff-track { order: 3; flex: 1 0 calc(100% - 66px); }
-  .eff-val { order: 4; flex: 0 0 56px; }
-  .eff-axis > span:not(.eff-track) { display: none; }
-  .eff-axis > span:nth-child(3) { display: block; order: 4; flex: 0 0 56px; }
+  .cost-wins { grid-template-columns: 1fr; gap: 8px; }
   .ticker { font-size: 10.5px; }
   .ticker-track > span { gap: 8px; padding: 11px 18px; }
   .hype-note { font-size: 0.82rem; }

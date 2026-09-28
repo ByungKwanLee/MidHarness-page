@@ -1362,63 +1362,60 @@
     io.observe(viz);
   }
 
-  /* ---------- Composition: Mid-Harness vs. Best-of-3 ---------- */
-  // Action scaling against parallel scaling: one run with Mid-Harness vs. three with Best-of-3.
-  // Rows index MH_DATA.composition; Sequential Refine is left out on purpose.
-  function initCombo() {
-    var box = $('#eff');
-    var D = window.MH_DATA && window.MH_DATA.composition;
-    if (!box || !D) return;
-    var LO = 30;
-    var HI = 85;
-    var REF = 1;
-    var groups = [
-      { runs: 1, rows: [[0, 'Base agent', 'base'], [3, '+ Mid-Harness, zero-shot', 'zs'], [6, '+ Mid-Harness, distilled', 'dist']] },
-      { runs: 3, rows: [[1, 'Best-of-3', 'bot'], [4, 'Best-of-3 + Mid-Harness, zero-shot', 'zs'], [7, 'Best-of-3 + Mid-Harness, distilled', 'dist']] }
+  /* ---------- Cost: Mid-Harness vs. parallel scaling ---------- */
+  function initCost() {
+    var C = window.MHCharts;
+    var D = window.MH_DATA && window.MH_DATA.cost;
+    if (!C || !D) return;
+    var chart = C.create('#chart-cost', C.scatter);
+    if (!chart) return;
+    var SERIES = [
+      { key: 'base', cls: 'k-base', marker: 'diamond', name: 'Base agent' },
+      { key: 'bot', cls: 'k-bot', marker: 'circle', name: 'Best-of-T' },
+      { key: 'zs', cls: 'k-zeroshot', marker: 'circle', name: 'Zero-shot Mid-Harness' },
+      { key: 'dist', cls: 'k-distilled', marker: 'square', name: 'Distilled Mid-Harness' },
+      { key: 'distbot', cls: 'k-combo', marker: 'diamond', hollow: true, name: 'Distilled Mid-Harness + Best-of-3' }
     ];
-    function pos(v) { return Math.max(0, Math.min(1, (v - LO) / (HI - LO))); }
-    box.innerHTML = groups.map(function (g) {
-      return '<div class="eff-group"><p class="eff-runs"><b>' + g.runs + '</b> environment run' + (g.runs > 1 ? 's' : '') + '</p>' +
-        g.rows.map(function (r) {
-          return '<div class="eff-row ' + r[2] + '" data-i="' + r[0] + '"><span class="eff-name">' + r[1] + '</span>' +
-            '<span class="eff-track"><span class="eff-fill"></span></span><b class="eff-val"></b><span class="eff-vs"></span></div>';
-        }).join('') + '</div>';
-    }).join('') +
-      '<div class="eff-row eff-axis" aria-hidden="true"><span></span><span class="eff-track">' +
-      [30, 45, 60, 75].map(function (t) { return '<i style="left:' + (pos(t) * 100).toFixed(2) + '%">' + t + '</i>'; }).join('') +
-      '</span><span></span><span></span></div>' +
-      '<div class="eff-ref" aria-hidden="true"><span>Best-of-3</span></div>';
-    var refLine = $('.eff-ref', box);
-    var tracks = $$('.eff-row:not(.eff-axis) .eff-track', box);
-    var refAt = 0;
-    // The dashed line marks Best-of-3's score across both groups, over the bar tracks.
-    function placeRef() {
-      var first = tracks[0];
-      var last = tracks[tracks.length - 1];
-      if (!first) return;
-      refLine.style.left = first.offsetLeft + refAt * first.offsetWidth + 'px';
-      refLine.style.top = first.offsetTop - 22 + 'px';
-      refLine.style.height = last.offsetTop + last.offsetHeight - first.offsetTop + 30 + 'px';
-    }
-    function update(model) {
-      var ref = D[REF][model][0];
-      refAt = pos(ref);
-      $$('.eff-row[data-i]', box).forEach(function (row) {
-        var v = D[+row.getAttribute('data-i')][model][0];
-        $('.eff-fill', row).style.setProperty('--w', pos(v));
-        $('.eff-val', row).textContent = v.toFixed(2);
-        if (!row.classList.contains('zs') && !row.classList.contains('dist')) return;
-        var d = v - ref;
-        var vs = $('.eff-vs', row);
-        vs.textContent = (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(2) + ' vs Best-of-3';
-        vs.className = 'eff-vs ' + (d >= 0 ? 'up' : 'down');
-      });
-      placeRef();
-    }
-    update('m9');
-    bindSeg('data-combo-model', update);
-    window.addEventListener('resize', placeRef);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeRef);
+    // Label offsets [dx, dy, anchor], placed so neighbouring points and the arrow stay clear.
+    var LABELS = {
+      'base|': ['Base agent', 10, 4, 'start'],
+      'bot|T = 3': [null, 9, 16, 'start'],
+      'bot|T = 5': [null, 10, 4, 'start'],
+      'bot|T = 7': [null, 10, 4, 'start'],
+      'zs|N = 4': [null, 8, 17, 'start'],
+      'zs|N = 8': [null, 8, 17, 'start'],
+      'dist|N = 4': [null, -9, -9, 'end'],
+      'dist|N = 8': [null, -9, -9, 'end'],
+      'distbot|': ['Distilled + Best-of-3', -12, 4, 'end']
+    };
+    function find(key, tag) { return D.filter(function (r) { return r.key === key && r.tag === tag; })[0]; }
+    var bot5 = find('bot', 'T = 5');
+    var dist8 = find('dist', 'N = 8');
+    chart.set({
+      xDomain: [0.032, 1.5],
+      xTicks: [0.04, 0.08, 0.16, 0.32, 0.64, 1.28],
+      xFormat: function (v) { return '$' + v; },
+      yDomain: [48, 68.5],
+      yTicks: [50, 55, 60, 65],
+      xTitle: 'Cost / run (USD, log scale)',
+      yTitle: 'Pass@1 (%)',
+      series: SERIES.map(function (s) {
+        return {
+          key: s.key, cls: s.cls, marker: s.marker, hollow: s.hollow,
+          points: D.filter(function (r) { return r.key === s.key; }).map(function (r) {
+            var l = LABELS[r.key + '|' + (r.tag || '')] || [];
+            return {
+              x: r.usd, y: r.pass1, label: l[0] || r.tag, dx: l[1], dy: l[2], anchor: l[3], keep: !!l[0],
+              tip: { title: s.name + (r.tag ? ' · ' + r.tag : ''), rows: [['Pass@1', r.pass1.toFixed(2) + '%'], ['Cost / run', '$' + r.usd.toFixed(2)]] }
+            };
+          })
+        };
+      }),
+      arrows: bot5 && dist8 ? [{ from: [bot5.usd, bot5.pass1], to: [dist8.usd, dist8.pass1], label: '3× cheaper', sub: 'same Pass@1' }] : []
+    });
+    C.legend('#legend-cost', chart, SERIES.map(function (s) {
+      return { key: s.key, label: s.name + (s.key === 'bot' ? ' · T = 3/5/7' : s.key === 'zs' || s.key === 'dist' ? ' · N = 4/8' : ''), cls: s.cls, marker: s.marker, hollow: s.hollow, line: s.key === 'bot' || s.key === 'zs' || s.key === 'dist' };
+    }));
   }
 
   /* ---------- Transfer cards ---------- */
@@ -1595,7 +1592,7 @@
     initHeader();
     initLinks();
     initTransfer();
-    initCombo();
+    initCost();
     initCharts();
     initMech();
     initRace();

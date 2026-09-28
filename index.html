@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260929t">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929v">
 
   <script>
     (function () {
@@ -547,21 +547,22 @@
         </header>
 
         <div class="subhead reveal"><span class="idx">3.1</span><h3>Composing action and trajectory scaling</h3></div>
-        <div class="combo reveal" id="combo">
-          <div class="combo-head">
+        <figure class="chart-card reveal" id="card-cost">
+          <div class="chart-head">
             <div>
-              <p class="chart-kicker">TerminalBench-Lite · Pass@1 · fixed TMAX generators</p>
-              <h4 class="chart-title">One run with Mid-Harness vs. three with Best-of-3</h4>
-            </div>
-            <div class="seg" role="group" aria-label="Model size">
-              <button type="button" aria-pressed="false" data-combo-model="m4">TMAX-4B</button>
-              <button type="button" aria-pressed="true" data-combo-model="m9">TMAX-9B</button>
-              <button type="button" aria-pressed="false" data-combo-model="m27">TMAX-27B</button>
+              <p class="chart-kicker">Token cost · TMAX-9B · TerminalBench-Lite</p>
+              <h4 class="chart-title">More Pass@1 per dollar than parallel scaling</h4>
             </div>
           </div>
-          <div class="eff" id="eff"></div>
-          <p class="combo-foot">Mid-Harness uses pairwise verification (N = 8) inside a single run. Best-of-3 runs three full trajectories and returns one, chosen by the same TMAX model as trajectory verifier. Environment runs count executions per returned output. Bars start at 30%.</p>
-        </div>
+          <div class="chart" id="chart-cost" role="img" aria-label="Scatter plot of Pass@1 against estimated token cost per run: base agent, Best-of-T with T of 3, 5 and 7, zero-shot and distilled Mid-Harness with N of 4 and 8, and distilled Mid-Harness combined with Best-of-3."></div>
+          <div class="legend" id="legend-cost"></div>
+          <div class="cost-wins">
+            <p class="cost-win"><b>3× cheaper</b><span>Distilled Mid-Harness (N = 8) matches Best-of-5 at 57.14% Pass@1: $0.21 vs. $0.62 per run.</span></p>
+            <p class="cost-win"><b>4× cheaper</b><span>Distilled Mid-Harness (N = 4) edges out Best-of-3, 55.44% vs. 55.10%: $0.08 vs. $0.34.</span></p>
+            <p class="cost-win"><b>+7.15 pts</b><span>Distilled Mid-Harness + Best-of-3 beats Best-of-7, 66.33% vs. 59.18%, at 12% lower cost.</span></p>
+          </div>
+          <figcaption>Estimated token cost per run at OpenRouter Qwen3.5-9B rates ($0.08 / $0.13 per million input / output tokens), not a measured serving bill. Points are operating points, not an equal-budget experiment. Mid-Harness uses pairwise verification.</figcaption>
+        </figure>
 
         <div class="subhead reveal" id="transfer"><span class="idx">3.2</span><h3>Transfer across models, benchmarks, and harnesses</h3></div>
         <figure class="chart-card reveal" id="card-scale" style="margin-bottom: clamp(20px, 3vw, 32px);">
@@ -677,8 +678,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260929t" defer></script>
-  <script src="assets/js/charts.js?v=20260929t" defer></script>
-  <script src="assets/js/main.js?v=20260929t" defer></script>
+  <script src="assets/js/data.js?v=20260929v" defer></script>
+  <script src="assets/js/charts.js?v=20260929v" defer></script>
+  <script src="assets/js/main.js?v=20260929v" defer></script>
 </body>
 </html>

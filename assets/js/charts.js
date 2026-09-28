@@ -299,6 +299,82 @@
     return f.svg;
   }
 
+  /* ---------- Scatter with a log-scaled x axis ---------- */
+  function renderScatter(container, cfg) {
+    var small = container.clientWidth < 520;
+    var H = small ? 330 : 400;
+    var f = frame(container, H, { t: 20, r: small ? 22 : 40, b: 52, l: small ? 42 : 52 });
+    var lx0 = Math.log(cfg.xDomain[0]);
+    var lx1 = Math.log(cfg.xDomain[1]);
+    var x = function (v) { return f.m.l + (Math.log(v) - lx0) / (lx1 - lx0) * f.iw; };
+    var y = linear(cfg.yDomain[0], cfg.yDomain[1], f.m.t + f.ih, f.m.t);
+
+    yAxis(f, y, cfg.yTicks, null, cfg.yTitle);
+    baseline(f);
+    cfg.xTicks.forEach(function (v) {
+      text(f.svg, x(v), f.m.t + f.ih + 19, cfg.xFormat ? cfg.xFormat(v) : String(v), { 'class': 'tick', 'text-anchor': 'middle' });
+    });
+    xTitle(f, cfg.xTitle);
+
+    var lines = el('g', {}, f.svg);
+    cfg.series.forEach(function (s) {
+      if (s.points.length < 2) return;
+      var pts = s.points.map(function (p) { return [x(p.x), y(p.y)]; });
+      el('path', {
+        'class': 'line s draw ' + s.cls, d: pathFrom(pts),
+        'data-k': 'line-' + s.key, 'data-pts': ptsStr(pts), 'data-series': s.key
+      }, lines);
+    });
+
+    // Arrows run between two data points and stop short of their markers.
+    (cfg.arrows || []).forEach(function (a) {
+      var x1 = x(a.from[0]);
+      var y1 = y(a.from[1]);
+      var x2 = x(a.to[0]);
+      var y2 = y(a.to[1]);
+      var len = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) || 1;
+      var ux = (x2 - x1) / len;
+      var uy = (y2 - y1) / len;
+      var sx = x1 + ux * 12;
+      var sy = y1 + uy * 12;
+      var ex = x2 - ux * 12;
+      var ey = y2 - uy * 12;
+      var g = el('g', { 'class': 'anno-arrow pop' }, f.svg);
+      g.style.setProperty('--delay', '0.9s');
+      el('line', { 'class': 'anno-line', x1: sx.toFixed(2), y1: sy.toFixed(2), x2: ex.toFixed(2), y2: ey.toFixed(2) }, g);
+      el('path', {
+        'class': 'anno-line',
+        d: 'M' + (ex - ux * 7 - uy * 4.5).toFixed(2) + ' ' + (ey - uy * 7 + ux * 4.5).toFixed(2) +
+          'L' + ex.toFixed(2) + ' ' + ey.toFixed(2) +
+          'L' + (ex - ux * 7 + uy * 4.5).toFixed(2) + ' ' + (ey - uy * 7 - ux * 4.5).toFixed(2)
+      }, g);
+      var mx = (sx + ex) / 2;
+      var my = (sy + ey) / 2 + (a.dy === undefined ? -22 : a.dy);
+      text(g, mx, my, a.label, { 'class': 'anno', 'text-anchor': 'middle' });
+      if (a.sub && !small) text(g, mx, my + 14, a.sub, { 'class': 'anno-sub', 'text-anchor': 'middle' });
+    });
+
+    var marks = el('g', {}, f.svg);
+    var size = small ? 4.4 : 5.2;
+    cfg.series.forEach(function (s) {
+      s.points.forEach(function (p, j) {
+        var px = x(p.x);
+        var py = y(p.y);
+        addMarker(marks, {
+          key: s.key + '-' + j, cls: s.cls, series: s.key, marker: s.marker, hollow: s.hollow,
+          x: px, y: py, tip: p.tip, delay: 0.25 + j * 0.12
+        }, size);
+        // Narrow charts keep only the labels marked `keep`; the legend and tooltips carry the rest.
+        if (p.label && (!small || p.keep)) {
+          text(f.svg, px + (p.dx || 10), py + (p.dy === undefined ? 4 : p.dy), p.label, {
+            'class': 'val s pop ' + s.cls, 'text-anchor': p.anchor || 'start', 'data-series': s.key
+          });
+        }
+      });
+    });
+    return f.svg;
+  }
+
   /* ---------- Horizontal grouped bars ---------- */
   function renderHBars(container, cfg) {
     var small = container.clientWidth < 520;
@@ -549,6 +625,7 @@
     create: create,
     legend: legend,
     line: renderLine,
-    hbars: renderHBars
+    hbars: renderHBars,
+    scatter: renderScatter
   };
 })();

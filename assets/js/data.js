@@ -48,6 +48,21 @@ window.MH_DATA = (function () {
       { bot: 0, sr: 1, zs: 0, dist: 1, env: 2, m4: [46.6, 62.24], m9: [60.2, 75.51], m27: [75.85, 85.71] }
     ],
 
+    // Pass@1 against reference-priced token cost per run (USD), TMAX-9B on TerminalBench-Lite.
+    // From the paper's cost figure (figures/scaling_cost/data.csv) at OpenRouter Qwen3.5-9B rates,
+    // $0.08 / $0.13 per million input / output tokens. Sequential Refine points are left out.
+    cost: [
+      { key: 'base', usd: 0.0443, pass1: 50.0 },
+      { key: 'bot', tag: 'T = 3', usd: 0.3390, pass1: 55.10 },
+      { key: 'bot', tag: 'T = 5', usd: 0.6195, pass1: 57.14 },
+      { key: 'bot', tag: 'T = 7', usd: 0.9066, pass1: 59.18 },
+      { key: 'zs', tag: 'N = 4', usd: 0.0855, pass1: 54.42 },
+      { key: 'zs', tag: 'N = 8', usd: 0.1740, pass1: 54.76 },
+      { key: 'dist', tag: 'N = 4', usd: 0.0842, pass1: 55.44 },
+      { key: 'dist', tag: 'N = 8', usd: 0.2073, pass1: 57.14 },
+      { key: 'distbot', usd: 0.7970, pass1: 66.33 }
+    ],
+
     // Model scale (TerminalBench-Lite, Vanillux2): base agent, zero-shot and distilled Mid-Harness (N = 8).
     modelScale: [
       { model: 'TMAX-4B', base: [38.78, 57.14], zs: [41.5, 57.14], dist: [43.88, 58.16] },
