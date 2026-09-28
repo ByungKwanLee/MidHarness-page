@@ -1362,80 +1362,63 @@
     io.observe(viz);
   }
 
-  /* ---------- Composition table ---------- */
+  /* ---------- Composition: Mid-Harness vs. Best-of-3 ---------- */
+  // Action scaling against parallel scaling: one run with Mid-Harness vs. three with Best-of-3.
+  // Rows index MH_DATA.composition; Sequential Refine is left out on purpose.
   function initCombo() {
-    var grid = $('#combo-grid');
+    var box = $('#eff');
     var D = window.MH_DATA && window.MH_DATA.composition;
-    if (!grid || !D) return;
-
+    if (!box || !D) return;
+    var LO = 30;
+    var HI = 85;
+    var REF = 1;
     var groups = [
-      { title: 'Trajectory scaling only', rows: [0, 1, 2], cls: '' },
-      { title: '+ Zero-shot Mid-Harness', rows: [3, 4, 5], cls: 'zs' },
-      { title: '+ Distilled Mid-Harness', rows: [6, 7, 8], cls: 'dist' }
+      { runs: 1, rows: [[0, 'Base agent', 'base'], [3, '+ Mid-Harness, zero-shot', 'zs'], [6, '+ Mid-Harness, distilled', 'dist']] },
+      { runs: 3, rows: [[1, 'Best-of-3', 'bot'], [4, 'Best-of-3 + Mid-Harness, zero-shot', 'zs'], [7, 'Best-of-3 + Mid-Harness, distilled', 'dist']] }
     ];
-    function ck(on, name) {
-      return on
-        ? '<span class="ck yes" role="img" aria-label="' + name + ' on">✓</span>'
-        : '<span class="ck no" role="img" aria-label="' + name + ' off">×</span>';
+    function pos(v) { return Math.max(0, Math.min(1, (v - LO) / (HI - LO))); }
+    box.innerHTML = groups.map(function (g) {
+      return '<div class="eff-group"><p class="eff-runs"><b>' + g.runs + '</b> environment run' + (g.runs > 1 ? 's' : '') + '</p>' +
+        g.rows.map(function (r) {
+          return '<div class="eff-row ' + r[2] + '" data-i="' + r[0] + '"><span class="eff-name">' + r[1] + '</span>' +
+            '<span class="eff-track"><span class="eff-fill"></span></span><b class="eff-val"></b><span class="eff-vs"></span></div>';
+        }).join('') + '</div>';
+    }).join('') +
+      '<div class="eff-row eff-axis" aria-hidden="true"><span></span><span class="eff-track">' +
+      [30, 45, 60, 75].map(function (t) { return '<i style="left:' + (pos(t) * 100).toFixed(2) + '%">' + t + '</i>'; }).join('') +
+      '</span><span></span><span></span></div>' +
+      '<div class="eff-ref" aria-hidden="true"><span>Best-of-3</span></div>';
+    var refLine = $('.eff-ref', box);
+    var tracks = $$('.eff-row:not(.eff-axis) .eff-track', box);
+    var refAt = 0;
+    // The dashed line marks Best-of-3's score across both groups, over the bar tracks.
+    function placeRef() {
+      var first = tracks[0];
+      var last = tracks[tracks.length - 1];
+      if (!first) return;
+      refLine.style.left = first.offsetLeft + refAt * first.offsetWidth + 'px';
+      refLine.style.top = first.offsetTop - 22 + 'px';
+      refLine.style.height = last.offsetTop + last.offsetHeight - first.offsetTop + 30 + 'px';
     }
-    function delta(d) {
-      var r = Math.round(d * 100) / 100;
-      var cls = r > 0 ? 'pos' : r < 0 ? 'neg' : 'zero';
-      var s = r > 0 ? '+' + r.toFixed(2) : r < 0 ? '−' + Math.abs(r).toFixed(2) : '+0.00';
-      return '<span class="delta ' + cls + '">' + s + '</span>';
-    }
-
-    var html = '<div class="combo-row th" role="row">' +
-      '<span class="c ck-h" role="columnheader">Best-of-<i>T</i></span>' +
-      '<span class="c ck-h" role="columnheader">SR</span>' +
-      '<span class="c ck-h" role="columnheader">Zero-shot<br>MH</span>' +
-      '<span class="c ck-h" role="columnheader">Distilled<br>MH</span>' +
-      '<span class="cfg-h" role="columnheader">Configuration</span>' +
-      '<span role="columnheader">Pass@1</span>' +
-      '<span class="num" role="columnheader">Pass@3</span>' +
-      '<span class="c env-h" role="columnheader"># Env.</span></div>';
-
-    groups.forEach(function (g) {
-      html += '<div class="combo-row group" role="row"><span role="cell">' + g.title + '</span></div>';
-      g.rows.forEach(function (i) {
-        var r = D[i];
-        var tags = [];
-        if (!r.bot && !r.sr && !r.zs && !r.dist) tags.push('<span class="tagc">Base agent</span>');
-        if (r.bot) tags.push('<span class="tagc">Best-of-<i>T</i></span>');
-        if (r.sr) tags.push('<span class="tagc">SR</span>');
-        if (r.zs) tags.push('<span class="tagc zs">Zero-shot MH</span>');
-        if (r.dist) tags.push('<span class="tagc dist">Distilled MH</span>');
-        html += '<div class="combo-row ' + g.cls + '" role="row" data-row="' + i + '">' +
-          '<span class="c ck-cell" role="cell">' + ck(r.bot, 'Best-of-T') + '</span>' +
-          '<span class="c ck-cell" role="cell">' + ck(r.sr, 'SR') + '</span>' +
-          '<span class="c ck-cell" role="cell">' + ck(r.zs, 'Zero-shot Mid-Harness') + '</span>' +
-          '<span class="c ck-cell" role="cell">' + ck(r.dist, 'Distilled Mid-Harness') + '</span>' +
-          '<span class="combo-cfg" role="cell">' + tags.join('') + '<span class="envn">' + r.env + ' env</span></span>' +
-          '<span class="p1cell" role="cell"><span class="p1bar"><span></span></span><span class="p1val"></span></span>' +
-          '<span class="num p3" role="cell"></span>' +
-          '<span class="c env-cell" role="cell">' + r.env + '</span>' +
-          '</div>';
-      });
-    });
-    grid.innerHTML = html;
-
     function update(model) {
-      var base = D[0][model];
-      var best1 = Math.max.apply(null, D.map(function (r) { return r[model][0]; }));
-      var best3 = Math.max.apply(null, D.map(function (r) { return r[model][1]; }).filter(function (v) { return v !== null; }));
-      $$('.combo-row[data-row]', grid).forEach(function (row) {
-        var i = +row.getAttribute('data-row');
-        var v = D[i][model];
-        row.querySelector('.p1bar span').style.setProperty('--v', v[0]);
-        row.querySelector('.p1val').innerHTML = '<span class="' + (v[0] === best1 ? 'best' : '') + '">' + v[0].toFixed(2) + '</span>' + (i ? delta(v[0] - base[0]) : '');
-        row.querySelector('.p3').innerHTML = v[1] === null
-          ? '<span style="color:var(--text-3)">—</span>'
-          : '<span class="' + (v[1] === best3 ? 'best' : '') + '">' + v[1].toFixed(2) + '</span>' + (i ? delta(v[1] - base[1]) : '');
-        row.classList.toggle('is-best-row', v[0] === best1);
+      var ref = D[REF][model][0];
+      refAt = pos(ref);
+      $$('.eff-row[data-i]', box).forEach(function (row) {
+        var v = D[+row.getAttribute('data-i')][model][0];
+        $('.eff-fill', row).style.setProperty('--w', pos(v));
+        $('.eff-val', row).textContent = v.toFixed(2);
+        if (!row.classList.contains('zs') && !row.classList.contains('dist')) return;
+        var d = v - ref;
+        var vs = $('.eff-vs', row);
+        vs.textContent = (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(2) + ' vs Best-of-3';
+        vs.className = 'eff-vs ' + (d >= 0 ? 'up' : 'down');
       });
+      placeRef();
     }
     update('m9');
     bindSeg('data-combo-model', update);
+    window.addEventListener('resize', placeRef);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeRef);
   }
 
   /* ---------- Transfer cards ---------- */

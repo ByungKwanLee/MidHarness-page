@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260929r">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929t">
 
   <script>
     (function () {
@@ -550,8 +550,8 @@
         <div class="combo reveal" id="combo">
           <div class="combo-head">
             <div>
-              <p class="chart-kicker">TerminalBench-Lite · fixed TMAX generators</p>
-              <h4 class="chart-title">Each axis helps; together they help most</h4>
+              <p class="chart-kicker">TerminalBench-Lite · Pass@1 · fixed TMAX generators</p>
+              <h4 class="chart-title">One run with Mid-Harness vs. three with Best-of-3</h4>
             </div>
             <div class="seg" role="group" aria-label="Model size">
               <button type="button" aria-pressed="false" data-combo-model="m4">TMAX-4B</button>
@@ -559,8 +559,8 @@
               <button type="button" aria-pressed="false" data-combo-model="m27">TMAX-27B</button>
             </div>
           </div>
-          <div class="combo-grid" id="combo-grid" role="table" aria-label="Pass@1 and Pass@3 for combinations of Best-of-T, Sequential Refine, and Mid-Harness"></div>
-          <p class="combo-foot">Mid-Harness uses pairwise verification (N = 8); Best-of-<i>T</i> uses <i>T</i> = 3 trajectories with the same TMAX model as trajectory verifier; SR uses <i>R</i> = 1 round. Deltas are against the base agent. # Env. counts environment executions per returned output. Best-of-<i>T</i> returns one output, so Pass@3 is undefined.</p>
+          <div class="eff" id="eff"></div>
+          <p class="combo-foot">Mid-Harness uses pairwise verification (N = 8) inside a single run. Best-of-3 runs three full trajectories and returns one, chosen by the same TMAX model as trajectory verifier. Environment runs count executions per returned output. Bars start at 30%.</p>
         </div>
 
         <div class="subhead reveal" id="transfer"><span class="idx">3.2</span><h3>Transfer across models, benchmarks, and harnesses</h3></div>
@@ -677,8 +677,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260929r" defer></script>
-  <script src="assets/js/charts.js?v=20260929r" defer></script>
-  <script src="assets/js/main.js?v=20260929r" defer></script>
+  <script src="assets/js/data.js?v=20260929t" defer></script>
+  <script src="assets/js/charts.js?v=20260929t" defer></script>
+  <script src="assets/js/main.js?v=20260929t" defer></script>
 </body>
 </html>
