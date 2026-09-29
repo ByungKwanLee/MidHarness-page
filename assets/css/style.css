@@ -2642,17 +2642,6 @@ html[data-theme="dark"] .race-viz {
   color: #f2f2ec;
 }
 .op-ex + .op-ex { --op-c: #ff7a45; background: radial-gradient(80% 90% at 0% 0%, rgba(255, 122, 69, 0.12), transparent 60%), #111215; }
-/* On light pages the open problem lifts from near-black to graphite, like the overview stage. */
-html[data-theme="light"] .open-prob {
-  background:
-    radial-gradient(70% 100% at 0% 0%, rgba(255, 170, 60, 0.3), transparent 60%) padding-box,
-    radial-gradient(60% 90% at 100% 100%, rgba(96, 140, 255, 0.26), transparent 62%) padding-box,
-    linear-gradient(155deg, #3b301f, #2c2e30 50%, #272e3e) padding-box,
-    conic-gradient(from var(--tl-a), rgba(255, 176, 64, 0.95), rgba(255, 255, 255, 0.08) 25%, rgba(109, 139, 255, 0.9) 50%, rgba(255, 255, 255, 0.08) 75%, rgba(255, 176, 64, 0.95)) border-box;
-  box-shadow: 0 40px 80px -40px rgba(60, 40, 10, 0.35);
-}
-html[data-theme="light"] .op-ex { background: radial-gradient(80% 90% at 0% 0%, rgba(255, 176, 64, 0.16), transparent 60%), #2b2d30; }
-html[data-theme="light"] .op-ex + .op-ex { background: radial-gradient(80% 90% at 0% 0%, rgba(255, 122, 69, 0.16), transparent 60%), #2b2d30; }
 .op-ex-head { display: flex; align-items: baseline; gap: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--op-c); }
 .op-ex-head b { margin-left: auto; letter-spacing: 0; color: #fff; font-variant-numeric: tabular-nums; }
 .op-ex-q { margin-top: 8px; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
@@ -2661,6 +2650,44 @@ html[data-theme="light"] .op-ex + .op-ex { background: radial-gradient(80% 90% a
 .op-ex-note { margin-top: 10px; font-size: 0.9rem; line-height: 1.5; color: rgba(242, 242, 236, 0.72); }
 .op-ex-note code { font-family: var(--font-mono); font-size: 0.92em; color: var(--op-c); }
 .op-ex-src { margin-top: 10px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; color: var(--text-3); text-align: center; }
+
+/* Light pages get a light open problem: paper with the same amber and blue glows, and deeper amber for text on white. */
+html[data-theme="light"] .open-prob {
+  background:
+    radial-gradient(70% 100% at 0% 0%, rgba(255, 176, 64, 0.2), transparent 60%) padding-box,
+    radial-gradient(60% 90% at 100% 100%, rgba(96, 140, 255, 0.16), transparent 62%) padding-box,
+    linear-gradient(155deg, #fffaf1, #ffffff 50%, #f5f7ff) padding-box,
+    conic-gradient(from var(--tl-a), rgba(240, 150, 30, 0.95), rgba(60, 50, 20, 0.1) 25%, rgba(90, 120, 240, 0.9) 50%, rgba(60, 50, 20, 0.1) 75%, rgba(240, 150, 30, 0.95)) border-box;
+  color: #1b1d18;
+  box-shadow: 0 40px 80px -45px rgba(120, 80, 20, 0.28);
+}
+html[data-theme="light"] .open-prob::before { background-image: radial-gradient(rgba(60, 50, 20, 0.12) 1px, transparent 1.3px); }
+html[data-theme="light"] .op-tag { border-color: rgba(214, 140, 20, 0.45); background: rgba(255, 176, 64, 0.14); color: #a86300; }
+html[data-theme="light"] .op-title { color: #16150f; }
+html[data-theme="light"] .op-title em { color: #dd8700; text-shadow: 0 0 24px rgba(255, 176, 64, 0.3); }
+html[data-theme="light"] .op-sub,
+html[data-theme="light"] .op-cap,
+html[data-theme="light"] .op-key { color: rgba(27, 29, 24, 0.72); }
+html[data-theme="light"] .op-stat { border-image: linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.02)) 1; }
+html[data-theme="light"] .op-num { background-image: linear-gradient(180deg, #ffb13d, #f08a1c 55%, #e0561f); }
+html[data-theme="light"] .op-num small { color: rgba(27, 29, 24, 0.6); }
+html[data-theme="light"] .op-bar { background: rgba(0, 0, 0, 0.08); }
+html[data-theme="light"] .op-key b { color: #1b1d18; }
+html[data-theme="light"] .op-ex {
+  --op-c: #e8900a;
+  border-right-color: rgba(0, 0, 0, 0.08);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+  border-left-color: rgba(0, 0, 0, 0.08);
+  background: radial-gradient(80% 90% at 0% 0%, rgba(255, 176, 64, 0.12), transparent 60%), #fff;
+  color: #1b1d18;
+  box-shadow: 0 20px 40px -30px rgba(120, 80, 20, 0.25);
+}
+html[data-theme="light"] .op-ex + .op-ex { --op-c: #e8622e; background: radial-gradient(80% 90% at 0% 0%, rgba(255, 122, 69, 0.12), transparent 60%), #fff; }
+html[data-theme="light"] .op-ex-head b,
+html[data-theme="light"] .op-ex-q { color: #1b1d18; }
+html[data-theme="light"] .op-ex-code { border-color: rgba(0, 0, 0, 0.08); background: #f7f8f3; color: #2a2d27; }
+html[data-theme="light"] .op-ex-code mark { color: #1b1d18; }
+html[data-theme="light"] .op-ex-note { color: rgba(27, 29, 24, 0.72); }
 
 /* ---------- Footer ---------- */
 .site-footer {
@@ -2706,6 +2733,7 @@ html[data-theme="light"] .op-ex + .op-ex { background: radial-gradient(80% 90% a
   .open-prob { grid-template-columns: 1fr; }
   .op-examples { grid-template-columns: 1fr; }
   .op-stat { padding: 20px 0 0; border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.14); border-image: none; }
+  html[data-theme="light"] .op-stat { border-image: none; border-top-color: rgba(0, 0, 0, 0.1); }
   .tl-spot .race { margin-top: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
   /* Every step of the turning border repaints the whole card; phones step about 15 times a second instead of every frame. */
   .col, .tl-spot, .open-prob { animation-timing-function: steps(180); }
