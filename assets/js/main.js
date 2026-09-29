@@ -883,6 +883,13 @@
       }
     }
 
+    // Untyped error lines are the failing run both agents start from.
+    function flashStart() {
+      $$('.term-line.err:not([data-type])', stage).forEach(function (n) {
+        if (n.animate) n.animate([{ backgroundColor: 'rgba(255, 107, 107, 0.26)' }, { backgroundColor: 'rgba(255, 107, 107, 0)' }], { duration: 1400, easing: 'ease-out' });
+      });
+    }
+
     function play(loop) {
       reset(loop);
       if (reduceMotion) { showFinal(); return; }
@@ -890,8 +897,10 @@
       if (!loop && goal) {
         later(200, function () { stage.classList.add('p0'); typeGoal(); });
         t = 200 + goalText.length * 24 + 350;
-        later(t, function () { stage.classList.add('fork'); });
+        later(t, function () { stage.classList.add('fork'); flashStart(); });
         t += 450;
+      } else {
+        later(0, flashStart);
       }
       later(t, function () { runRound(0); });
     }
