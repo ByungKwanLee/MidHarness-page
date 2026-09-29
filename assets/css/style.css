@@ -712,6 +712,21 @@ html[data-theme="light"] .board tbody tr:hover { background: rgba(0, 0, 0, 0.025
   overflow: hidden;
 }
 html[data-theme="dark"] .stage { border-color: rgba(255, 255, 255, 0.11); }
+/* On light pages the stage lifts from near-black to graphite; terminals stay the darkest layer. */
+html[data-theme="light"] .stage {
+  --s-faint: #71766d;
+  background:
+    radial-gradient(900px 380px at 88% 118%, rgba(118, 185, 0, 0.24), transparent 62%),
+    radial-gradient(700px 300px at 0% -20%, rgba(255, 255, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, #2c302a, #232621);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 40px 90px -45px rgba(30, 45, 10, 0.4);
+}
+html[data-theme="light"] .lane { border-color: #474c45; background: rgba(24, 26, 23, 0.7); box-shadow: 0 20px 40px -25px rgba(0, 0, 0, 0.5); }
+html[data-theme="light"] .lane-mid { border-color: rgba(118, 185, 0, 0.6); box-shadow: 0 0 0 1px rgba(118, 185, 0, 0.14), 0 24px 60px -30px rgba(118, 185, 0, 0.35); }
+html[data-theme="light"] .lane-bar { background: #161815; border-bottom-color: #3b3f39; }
+html[data-theme="light"] .lane-mid .lane-bar { background: var(--green); border-bottom-color: var(--green); }
+html[data-theme="light"] .term { background: #0d0e0c; border-color: #343832; }
 .stage::before {
   content: "";
   position: absolute;
