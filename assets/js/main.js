@@ -1465,7 +1465,7 @@
     initCostSlides();
   }
 
-  // Two slides (verifier with reasoning, one-token verifier): the switch, left/right keys, or a swipe.
+  // Two slides (one-token verifier, then verifier with reasoning): the switch, left/right keys, or a swipe.
   function initCostSlides() {
     var card = $('#card-cost');
     var track = card && $('.slides', card);
