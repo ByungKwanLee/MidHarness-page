@@ -63,6 +63,20 @@ window.MH_DATA = (function () {
       { key: 'distbot', usd: 0.7970, pass1: 66.33 }
     ],
 
+    // The same chart with one-token (decision-only) pairwise verification, from the paper's appendix figure.
+    // Points were read from the vector figure and match its tables to 0.05; base agent and Best-of-T are unchanged.
+    costJev: [
+      { key: 'base', usd: 0.0443, pass1: 50.0 },
+      { key: 'bot', tag: 'T = 3', usd: 0.3390, pass1: 55.10 },
+      { key: 'bot', tag: 'T = 5', usd: 0.6195, pass1: 57.14 },
+      { key: 'bot', tag: 'T = 7', usd: 0.9066, pass1: 59.18 },
+      { key: 'zs', tag: 'N = 4', usd: 0.0603, pass1: 52.72 },
+      { key: 'zs', tag: 'N = 8', usd: 0.1376, pass1: 56.12 },
+      { key: 'dist', tag: 'N = 4', usd: 0.0667, pass1: 54.42 },
+      { key: 'dist', tag: 'N = 8', usd: 0.1574, pass1: 59.18 },
+      { key: 'distbot', usd: 0.6084, pass1: 65.31 }
+    ],
+
     // Model scale (TerminalBench-Lite, Vanillux2): base agent, zero-shot and distilled Mid-Harness (N = 8).
     modelScale: [
       { model: 'TMAX-4B', base: [38.78, 57.14], zs: [41.5, 57.14], dist: [43.88, 58.16] },

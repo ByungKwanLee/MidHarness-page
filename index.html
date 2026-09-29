@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260930g">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260930j">
 
   <script>
     (function () {
@@ -547,21 +547,49 @@
         </header>
 
         <div class="subhead reveal"><span class="idx">3.1</span><h3>Action scaling vs. parallel scaling</h3></div>
-        <figure class="chart-card reveal" id="card-cost">
-          <div class="chart-head">
-            <div>
-              <p class="chart-kicker">Token cost · TMAX-9B · TerminalBench-Lite</p>
-              <h4 class="chart-title">More Pass@1 per dollar than parallel scaling</h4>
+        <figure class="chart-card reveal cost-slider" id="card-cost">
+          <div class="slides-nav">
+            <span class="slides-hint"><button type="button" class="slides-key" data-dir="-1" aria-label="Previous chart">←</button><button type="button" class="slides-key" data-dir="1" aria-label="Next chart">→</button><span class="sw" aria-hidden="true">Swipe</span></span>
+            <div class="seg" role="tablist" aria-label="Verifier output">
+              <button type="button" role="tab" id="tab-cost-reason" aria-controls="slide-cost-reason" aria-selected="true" data-slide="0">With reasoning</button>
+              <button type="button" role="tab" id="tab-cost-token" aria-controls="slide-cost-token" aria-selected="false" data-slide="1">One token</button>
             </div>
           </div>
-          <div class="chart" id="chart-cost" role="img" aria-label="Scatter plot of Pass@1 against estimated token cost per run: base agent, Best-of-T with T of 3, 5 and 7, Mid-Harness (Zero-shot) and Mid-Harness (Distilled) with N of 4 and 8, and Mid-Harness (Distilled) combined with Best-of-3."></div>
-          <div class="legend" id="legend-cost"></div>
-          <div class="cost-wins">
-            <p class="cost-win"><b>3× cheaper</b><span>Mid-Harness (Distilled, N = 8) matches Best-of-5 at 57.14% Pass@1: $0.21 vs. $0.62 per run.</span></p>
-            <p class="cost-win"><b>4× cheaper</b><span>Mid-Harness (Distilled, N = 4) edges out Best-of-3, 55.44% vs. 55.10%: $0.08 vs. $0.34.</span></p>
-            <p class="cost-win"><b>+7.15 pts</b><span>Mid-Harness (Distilled) + Best-of-3 beats Best-of-7, 66.33% vs. 59.18%, at 12% lower cost.</span></p>
+          <div class="slides">
+            <section class="slide" id="slide-cost-reason" role="tabpanel" aria-labelledby="tab-cost-reason">
+              <div class="chart-head">
+                <div>
+                  <p class="chart-kicker">Token cost · verifier with reasoning · TMAX-9B · TerminalBench-Lite</p>
+                  <h4 class="chart-title">More Pass@1 per dollar than parallel scaling</h4>
+                </div>
+              </div>
+              <div class="chart" id="chart-cost" role="img" aria-label="Scatter plot of Pass@1 against estimated token cost per run: base agent, Best-of-T with T of 3, 5 and 7, Mid-Harness (Zero-shot) and Mid-Harness (Distilled) with N of 4 and 8, and Mid-Harness (Distilled) combined with Best-of-3."></div>
+              <div class="legend" id="legend-cost"></div>
+              <div class="cost-wins">
+                <p class="cost-win"><b>3× cheaper</b><span>Mid-Harness (Distilled, N = 8) matches Best-of-5 at 57.14% Pass@1: $0.21 vs. $0.62 per run.</span></p>
+                <p class="cost-win"><b>4× cheaper</b><span>Mid-Harness (Distilled, N = 4) edges out Best-of-3, 55.44% vs. 55.10%: $0.08 vs. $0.34.</span></p>
+                <p class="cost-win"><b>+7.15 pts</b><span>Mid-Harness (Distilled) + Best-of-3 beats Best-of-7, 66.33% vs. 59.18%, at 12% lower cost.</span></p>
+              </div>
+              <p class="slide-note">Mid-Harness uses pairwise verification that writes out its reasoning before each verdict.</p>
+            </section>
+            <section class="slide" id="slide-cost-token" role="tabpanel" aria-labelledby="tab-cost-token">
+              <div class="chart-head">
+                <div>
+                  <p class="chart-kicker">Token cost · one-token verifier · TMAX-9B · TerminalBench-Lite</p>
+                  <h4 class="chart-title">Cheaper still with a one-token verifier</h4>
+                </div>
+              </div>
+              <div class="chart" id="chart-cost-token" role="img" aria-label="Scatter plot of Pass@1 against estimated token cost per run with a one-token verifier: base agent, Best-of-T with T of 3, 5 and 7, Mid-Harness (Zero-shot) and Mid-Harness (Distilled) with N of 4 and 8, and Mid-Harness (Distilled) combined with Best-of-3."></div>
+              <div class="legend" id="legend-cost-token"></div>
+              <div class="cost-wins">
+                <p class="cost-win"><b>5.8× cheaper</b><span>Mid-Harness (Distilled, N = 8) matches Best-of-7 at 59.18% Pass@1: $0.16 vs. $0.91 per run.</span></p>
+                <p class="cost-win"><b>24% cheaper</b><span>Mid-Harness (Distilled, N = 8) costs $0.16 instead of $0.21 with the reasoning verifier, and Pass@1 rises from 57.14% to 59.18%.</span></p>
+                <p class="cost-win"><b>+6.13 pts</b><span>Mid-Harness (Distilled) + Best-of-3 beats Best-of-7, 65.31% vs. 59.18%, at 33% lower cost.</span></p>
+              </div>
+              <p class="slide-note">At N = 4 the one-token verifier is cheaper but scores lower (52.72% and 54.42%). From the paper's appendix.</p>
+            </section>
           </div>
-          <figcaption>Estimated token cost per run at OpenRouter Qwen3.5-9B rates ($0.08 / $0.13 per million input / output tokens), not a measured serving bill. Points are operating points, not an equal-budget experiment. Mid-Harness uses pairwise verification.</figcaption>
+          <figcaption>Estimated token cost per run at OpenRouter Qwen3.5-9B rates ($0.08 / $0.13 per million input / output tokens), not a measured serving bill. Points are operating points, not an equal-budget experiment.</figcaption>
         </figure>
 
         <div class="subhead reveal" id="transfer"><span class="idx">3.2</span><h3>Transfer across models, benchmarks, and harnesses</h3></div>
@@ -678,8 +706,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260930g" defer></script>
-  <script src="assets/js/charts.js?v=20260930g" defer></script>
-  <script src="assets/js/main.js?v=20260930g" defer></script>
+  <script src="assets/js/data.js?v=20260930j" defer></script>
+  <script src="assets/js/charts.js?v=20260930j" defer></script>
+  <script src="assets/js/main.js?v=20260930j" defer></script>
 </body>
 </html>

@@ -1397,33 +1397,35 @@
   }
 
   /* ---------- Cost: Mid-Harness vs. parallel scaling ---------- */
-  function initCost() {
-    var C = window.MHCharts;
-    var D = window.MH_DATA && window.MH_DATA.cost;
-    if (!C || !D) return;
-    var chart = C.create('#chart-cost', C.scatter);
+  var COST_SERIES = [
+    { key: 'base', cls: 'k-base', marker: 'diamond', name: 'Base agent' },
+    { key: 'bot', cls: 'k-bot', marker: 'circle', name: 'Best-of-T' },
+    { key: 'zs', cls: 'k-zeroshot', marker: 'circle', name: 'Mid-Harness (Zero-shot)' },
+    { key: 'dist', cls: 'k-distilled', marker: 'square', name: 'Mid-Harness (Distilled)' },
+    { key: 'distbot', cls: 'k-combo', marker: 'diamond', hollow: true, name: 'Mid-Harness (Distilled) + T = 3' }
+  ];
+  // Label offsets [dx, dy, anchor], placed so neighbouring points and the arrow stay clear.
+  var COST_LABELS = {
+    'base|': ['Base agent', 10, 4, 'start'],
+    'bot|T = 3': [null, 9, 16, 'start'],
+    'bot|T = 5': [null, 10, 4, 'start'],
+    'bot|T = 7': [null, 10, 4, 'start'],
+    'zs|N = 4': [null, 8, 17, 'start'],
+    'zs|N = 8': [null, 8, 17, 'start'],
+    'dist|N = 4': [null, -9, -9, 'end'],
+    'dist|N = 8': [null, -9, -9, 'end'],
+    'distbot|': ['Mid-Harness (Distilled) + T = 3', -12, 4, 'end']
+  };
+  // `arrow` = [Best-of-T tag the arrow starts from, its label]; it ends at Mid-Harness (Distilled, N = 8).
+  // `labels` overrides COST_LABELS entries for this chart.
+  function drawCost(C, chartSel, legendSel, D, arrow, labels) {
+    var chart = D && C.create(chartSel, C.scatter);
     if (!chart) return;
-    var SERIES = [
-      { key: 'base', cls: 'k-base', marker: 'diamond', name: 'Base agent' },
-      { key: 'bot', cls: 'k-bot', marker: 'circle', name: 'Best-of-T' },
-      { key: 'zs', cls: 'k-zeroshot', marker: 'circle', name: 'Mid-Harness (Zero-shot)' },
-      { key: 'dist', cls: 'k-distilled', marker: 'square', name: 'Mid-Harness (Distilled)' },
-      { key: 'distbot', cls: 'k-combo', marker: 'diamond', hollow: true, name: 'Mid-Harness (Distilled) + T = 3' }
-    ];
-    // Label offsets [dx, dy, anchor], placed so neighbouring points and the arrow stay clear.
-    var LABELS = {
-      'base|': ['Base agent', 10, 4, 'start'],
-      'bot|T = 3': [null, 9, 16, 'start'],
-      'bot|T = 5': [null, 10, 4, 'start'],
-      'bot|T = 7': [null, 10, 4, 'start'],
-      'zs|N = 4': [null, 8, 17, 'start'],
-      'zs|N = 8': [null, 8, 17, 'start'],
-      'dist|N = 4': [null, -9, -9, 'end'],
-      'dist|N = 8': [null, -9, -9, 'end'],
-      'distbot|': ['Mid-Harness (Distilled) + T = 3', -12, 4, 'end']
-    };
+    var SERIES = COST_SERIES;
+    var LABELS = {};
+    Object.keys(COST_LABELS).forEach(function (k) { LABELS[k] = (labels && labels[k]) || COST_LABELS[k]; });
     function find(key, tag) { return D.filter(function (r) { return r.key === key && r.tag === tag; })[0]; }
-    var bot5 = find('bot', 'T = 5');
+    var from = find('bot', arrow[0]);
     var dist8 = find('dist', 'N = 8');
     chart.set({
       xDomain: [0.032, 1.5],
@@ -1445,11 +1447,80 @@
           })
         };
       }),
-      arrows: bot5 && dist8 ? [{ from: [bot5.usd, bot5.pass1], to: [dist8.usd, dist8.pass1], label: '3× cheaper', sub: 'same Pass@1' }] : []
+      arrows: from && dist8 ? [{ from: [from.usd, from.pass1], to: [dist8.usd, dist8.pass1], label: arrow[1], sub: 'same Pass@1' }] : []
     });
-    C.legend('#legend-cost', chart, SERIES.map(function (s) {
+    C.legend(legendSel, chart, SERIES.map(function (s) {
       return { key: s.key, label: s.name + (s.key === 'bot' ? ' · T = 3/5/7' : s.key === 'zs' || s.key === 'dist' ? ' · N = 4/8' : ''), cls: s.cls, marker: s.marker, hollow: s.hollow, line: s.key === 'bot' || s.key === 'zs' || s.key === 'dist' };
     }));
+  }
+  function initCost() {
+    var C = window.MHCharts;
+    var M = window.MH_DATA || {};
+    if (!C) return;
+    drawCost(C, '#chart-cost', '#legend-cost', M.cost, ['T = 5', '3× cheaper']);
+    // Here the composed point sits further left, so its label rises clear of the 65% tick on phones.
+    drawCost(C, '#chart-cost-token', '#legend-cost-token', M.costJev, ['T = 7', '5.8× cheaper'], {
+      'distbot|': ['Mid-Harness (Distilled) + T = 3', -12, -10, 'end']
+    });
+    initCostSlides();
+  }
+
+  // Two slides (verifier with reasoning, one-token verifier): the switch, left/right keys, or a swipe.
+  function initCostSlides() {
+    var card = $('#card-cost');
+    var track = card && $('.slides', card);
+    if (!track) return;
+    var slides = $$('.slide', track);
+    var tabs = $$('[data-slide]', card);
+    var keys = $$('[data-dir]', card);
+    var current = 0;
+    function stride() { return slides.length > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : track.clientWidth; }
+    function mark(i) {
+      current = i;
+      tabs.forEach(function (t, k) {
+        t.setAttribute('aria-selected', k === i ? 'true' : 'false');
+        t.tabIndex = k === i ? 0 : -1;
+      });
+      keys.forEach(function (b) {
+        var next = i + +b.getAttribute('data-dir');
+        b.disabled = next < 0 || next >= slides.length;
+      });
+    }
+    function go(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      track.scrollTo({ left: i * stride(), behavior: reduceMotion ? 'auto' : 'smooth' });
+      mark(i);
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () { go(+t.getAttribute('data-slide')); });
+    });
+    keys.forEach(function (b) {
+      b.addEventListener('click', function () { go(current + +b.getAttribute('data-dir')); });
+    });
+    var queued = false;
+    track.addEventListener('scroll', function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        var i = Math.round(track.scrollLeft / stride());
+        if (i !== current) mark(i);
+      });
+    }, { passive: true });
+    // Keys act while at least half the card is on screen, unless focus is in a field or another tab list.
+    document.addEventListener('keydown', function (e) {
+      if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (t && t.closest && t.closest('[role="tablist"]') && !card.contains(t)) return;
+      var r = card.getBoundingClientRect();
+      var seen = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+      if (seen < Math.min(r.height, window.innerHeight) * 0.5) return;
+      e.preventDefault();
+      go(current + (e.key === 'ArrowRight' ? 1 : -1));
+    });
+    window.addEventListener('resize', function () { track.scrollLeft = current * stride(); });
+    mark(0);
   }
 
   /* ---------- Transfer cards ---------- */
