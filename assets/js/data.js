@@ -138,6 +138,23 @@ window.MH_DATA = (function () {
         [4, 5, 1, 8], [4, 7, 1, 5], [6, 5, 2, 8], [6, 7, 3, 5],
         [5, 7, 8, 4], [3, 7, 6, 5], [2, 3, 9, 6], [2, 5, 9, 8]
       ]
+    },
+
+    // The turn after the fix: rerun the whole suite, or stop early, check only part of it, or repeat the install.
+    // Same format; the pivot stage assumes the ring's top four are 0, 2, 3 and 5.
+    demoLast: {
+      candidates: ['pytest', 'git commit -am "fix"', 'pip show pyyaml', 'pytest -k config', 'pip install pyyaml', 'pytest -x -q', 'pip freeze', 'cat src/config.py'],
+      choice: 0,
+      ringDuels: 8,
+      pivots: 4,
+      duels: [
+        [0, 3, 9, 6], [3, 6, 6, 2], [6, 1, 3, 1], [1, 5, 1, 8],
+        [5, 2, 8, 5], [2, 7, 6, 3], [7, 4, 4, 2], [4, 0, 2, 9],
+        [1, 0, 1, 9], [1, 2, 2, 5], [1, 3, 1, 6], [4, 2, 3, 5],
+        [4, 3, 2, 6], [4, 5, 2, 8], [6, 0, 2, 9], [6, 2, 3, 5],
+        [6, 5, 2, 8], [7, 0, 3, 9], [7, 3, 4, 6], [7, 5, 3, 8],
+        [3, 5, 6, 8], [2, 3, 5, 6], [0, 2, 9, 5], [0, 5, 9, 7]
+      ]
     }
   };
 })();

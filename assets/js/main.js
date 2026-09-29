@@ -545,7 +545,8 @@
     // Turns decided step by step: Mid-Harness candidates and the base agent's single sample.
     var rounds = [
       { turn: 2, D: M.demo, base: 'npm test' },
-      { turn: 3, D: M.demoNext, base: 'npm init -y' }
+      { turn: 3, D: M.demoNext, base: 'npm init -y' },
+      { turn: 4, D: M.demoLast, base: 'npm test' }
     ].filter(function (r) { return r.D; });
     var board = $('#stage-standings');
     var T = null;
@@ -827,19 +828,12 @@
             phase(3);
             runTurns(R.turn, function () {
               if (k + 1 < rounds.length) { later(600, function () { nextRound(k + 1); }); return; }
-              playRest(R.turn + 1, function () {
-                phase(4);
-                later(6000, function () { clearSteps(); later(450, function () { play(true); }); });
-              });
+              phase(4);
+              later(6000, function () { clearSteps(); later(450, function () { play(true); }); });
             });
           });
         });
       });
-    }
-    // Turns after the detailed ones are typed straight through.
-    function playRest(turn, done) {
-      if (turn > Math.max.apply(null, lanes.map(lastTurn))) { done(); return; }
-      later(500, function () { runTurns(turn, function () { playRest(turn + 1, done); }); });
     }
     function nextRound(k) {
       lanes.forEach(function (lane) {
