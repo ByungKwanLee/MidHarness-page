@@ -1406,9 +1406,9 @@
     var SERIES = [
       { key: 'base', cls: 'k-base', marker: 'diamond', name: 'Base agent' },
       { key: 'bot', cls: 'k-bot', marker: 'circle', name: 'Best-of-T' },
-      { key: 'zs', cls: 'k-zeroshot', marker: 'circle', name: 'Zero-shot Mid-Harness' },
-      { key: 'dist', cls: 'k-distilled', marker: 'square', name: 'Distilled Mid-Harness' },
-      { key: 'distbot', cls: 'k-combo', marker: 'diamond', hollow: true, name: 'Distilled Mid-Harness + Best-of-3' }
+      { key: 'zs', cls: 'k-zeroshot', marker: 'circle', name: 'Mid-Harness (Zero-shot)' },
+      { key: 'dist', cls: 'k-distilled', marker: 'square', name: 'Mid-Harness (Distilled)' },
+      { key: 'distbot', cls: 'k-combo', marker: 'diamond', hollow: true, name: 'Mid-Harness (Distilled) + T = 3' }
     ];
     // Label offsets [dx, dy, anchor], placed so neighbouring points and the arrow stay clear.
     var LABELS = {
@@ -1534,8 +1534,8 @@
     var scaleChart = C.create('#chart-scale', C.line);
     var SCALE = [
       { key: 'base', label: 'Base agent', cls: 'k-base', marker: 'diamond' },
-      { key: 'zs', label: 'Zero-shot Mid-Harness', cls: 'k-pairwise', marker: 'circle' },
-      { key: 'dist', label: 'Distilled Mid-Harness', cls: 'k-distilled', marker: 'square' }
+      { key: 'zs', label: 'Mid-Harness (Zero-shot)', cls: 'k-pairwise', marker: 'circle' },
+      { key: 'dist', label: 'Mid-Harness (Distilled)', cls: 'k-distilled', marker: 'square' }
     ];
     function scaleCfg(mi) {
       var name = mi === 0 ? 'Pass@1' : 'Pass@3';
