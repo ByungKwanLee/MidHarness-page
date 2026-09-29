@@ -656,8 +656,10 @@
     function bump(el, color) {
       if (el.animate) el.animate([{ transform: 'scale(1.8)', color: color }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
     }
+    // The flash tint follows the theme (white on the dark stage, a dark wash on the light one).
+    function flashColor() { return getComputedStyle(stage).getPropertyValue('--s-flash').trim() || 'rgba(255, 255, 255, 0.16)'; }
     function flash(row) {
-      if (row.animate) row.animate([{ backgroundColor: 'rgba(255, 255, 255, 0.16)' }, { backgroundColor: 'rgba(255, 255, 255, 0)' }], { duration: 420, easing: 'ease-out' });
+      if (row.animate) row.animate([{ backgroundColor: flashColor() }, { backgroundColor: 'transparent' }], { duration: 420, easing: 'ease-out' });
     }
     function duelStep(k) {
       var d = T.duels[k];
@@ -837,7 +839,7 @@
     function nextRound(k) {
       lanes.forEach(function (lane) {
         $$('[data-type][data-turn="' + rounds[k - 1].turn + '"]', lane).forEach(function (n) {
-          if (n.animate) n.animate([{ backgroundColor: 'rgba(255, 255, 255, 0.16)' }, { backgroundColor: 'rgba(255, 255, 255, 0)' }], { duration: 900, easing: 'ease-out' });
+          if (n.animate) n.animate([{ backgroundColor: flashColor() }, { backgroundColor: 'transparent' }], { duration: 900, easing: 'ease-out' });
         });
       });
       clearSteps();

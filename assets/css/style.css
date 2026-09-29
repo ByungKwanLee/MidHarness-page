@@ -691,13 +691,14 @@ html[data-theme="light"] .board tbody tr:hover { background: rgba(0, 0, 0, 0.025
 .hype-note a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 0.2em; }
 .hype-note a:hover { color: var(--accent); text-decoration-color: currentColor; }
 
-/* ---------- Stage (animated overview; always dark) ---------- */
+/* ---------- Stage (animated overview; dark, with a light variant for light pages) ---------- */
 .stage-section { padding: 0 0 clamp(80px, 10vw, 140px); }
 .stage {
   --s-text: #e9ece5;
   --s-dim: #8b9187;
   --s-faint: #5b6058;
   --s-line: rgba(255, 255, 255, 0.09);
+  --s-flash: rgba(255, 255, 255, 0.16);
   position: relative;
   isolation: isolate;
   border-radius: var(--radius-lg);
@@ -712,21 +713,6 @@ html[data-theme="light"] .board tbody tr:hover { background: rgba(0, 0, 0, 0.025
   overflow: hidden;
 }
 html[data-theme="dark"] .stage { border-color: rgba(255, 255, 255, 0.11); }
-/* On light pages the stage lifts from near-black to graphite; terminals stay the darkest layer. */
-html[data-theme="light"] .stage {
-  --s-faint: #71766d;
-  background:
-    radial-gradient(900px 380px at 88% 118%, rgba(118, 185, 0, 0.24), transparent 62%),
-    radial-gradient(700px 300px at 0% -20%, rgba(255, 255, 255, 0.08), transparent 60%),
-    linear-gradient(180deg, #2c302a, #232621);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 40px 90px -45px rgba(30, 45, 10, 0.4);
-}
-html[data-theme="light"] .lane { border-color: #474c45; background: rgba(24, 26, 23, 0.7); box-shadow: 0 20px 40px -25px rgba(0, 0, 0, 0.5); }
-html[data-theme="light"] .lane-mid { border-color: rgba(118, 185, 0, 0.6); box-shadow: 0 0 0 1px rgba(118, 185, 0, 0.14), 0 24px 60px -30px rgba(118, 185, 0, 0.35); }
-html[data-theme="light"] .lane-bar { background: #161815; border-bottom-color: #3b3f39; }
-html[data-theme="light"] .lane-mid .lane-bar { background: var(--green); border-bottom-color: var(--green); }
-html[data-theme="light"] .term { background: #0d0e0c; border-color: #343832; }
 .stage::before {
   content: "";
   position: absolute;
@@ -1125,6 +1111,56 @@ html[data-theme="light"] .term { background: #0d0e0c; border-color: #343832; }
 .lane.finished .lane-status { opacity: 1; transform: none; }
 .lane-base .lane-status { background: rgba(229, 72, 77, 0.14); color: #ff8a8d; border: 1px solid rgba(229, 72, 77, 0.35); }
 .lane-mid .lane-status { background: rgba(118, 185, 0, 0.14); color: #a9e45a; border: 1px solid rgba(118, 185, 0, 0.4); }
+
+/* Light pages get a light stage: white panels, dark text, and terminal colors dark enough to read on paper. */
+html[data-theme="light"] .stage {
+  --s-text: #1b1d18;
+  --s-dim: #5d6358;
+  --s-faint: #8d9288;
+  --s-line: rgba(0, 0, 0, 0.08);
+  --s-flash: rgba(60, 80, 20, 0.1);
+  background:
+    radial-gradient(900px 380px at 88% 118%, rgba(118, 185, 0, 0.14), transparent 62%),
+    linear-gradient(180deg, #ffffff, #f6f7f2);
+  border-color: rgba(20, 30, 10, 0.1);
+  box-shadow: 0 40px 90px -50px rgba(30, 45, 10, 0.3);
+}
+html[data-theme="light"] .stage::before {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+}
+html[data-theme="light"] .stage-replay { border-color: rgba(0, 0, 0, 0.14); }
+html[data-theme="light"] .stage-task { border-color: rgba(0, 0, 0, 0.1); background: #fff; }
+html[data-theme="light"] .stage.fork .stage-task { border-color: rgba(118, 185, 0, 0.6); }
+html[data-theme="light"] .st-av { border-color: rgba(0, 0, 0, 0.14); background: #f3f4ef; }
+html[data-theme="light"] .stage-fork::before,
+html[data-theme="light"] .stage-fork::after { border-color: rgba(0, 0, 0, 0.22); }
+html[data-theme="light"] .stage-fork i { border-top-color: rgba(0, 0, 0, 0.3); }
+html[data-theme="light"] .lane { border-color: #dcdfd6; background: #fff; box-shadow: 0 20px 40px -28px rgba(0, 0, 0, 0.18); }
+html[data-theme="light"] .lane-mid { border-color: rgba(118, 185, 0, 0.6); box-shadow: 0 0 0 1px rgba(118, 185, 0, 0.12), 0 24px 60px -30px rgba(118, 185, 0, 0.3); }
+html[data-theme="light"] .lane-bar { background: #eef0ea; border-bottom-color: #dcdfd6; color: #1b1d18; }
+html[data-theme="light"] .lane-mid .lane-bar { background: var(--green); border-bottom-color: var(--green); color: #0b0b0b; }
+html[data-theme="light"] .lturn b { border-color: rgba(0, 0, 0, 0.14); }
+html[data-theme="light"] .stage[data-active="1"] .lstep[data-step="1"],
+html[data-theme="light"] .stage[data-active="2"] .lstep[data-step="2"],
+html[data-theme="light"] .stage[data-active="3"] .lstep[data-step="3"] { border-color: rgba(0, 0, 0, 0.08); background: rgba(0, 0, 0, 0.025); }
+html[data-theme="light"] .chip { border-color: rgba(0, 0, 0, 0.14); background: #fff; }
+html[data-theme="light"] .stage.settled .lane-mid .lstep[data-step="1"] .chip:not(.is-best) { text-decoration-color: rgba(0, 0, 0, 0.35); }
+html[data-theme="light"] .srow .sbar { background: rgba(0, 0, 0, 0.07); }
+html[data-theme="light"] .srow .sbar span { background: rgba(0, 0, 0, 0.26); }
+html[data-theme="light"] .stage.settled .srow.is-best .q { color: #4d7a00; }
+html[data-theme="light"] .lane-base .no-verify { border-color: rgba(0, 0, 0, 0.14); }
+html[data-theme="light"] .term { background: #f7f8f3; border-color: #e0e3da; color: #2a2d27; }
+html[data-theme="light"] .term-line .ps { color: #1f6fd6; }
+html[data-theme="light"] .term-line.err { color: #d03a3a; }
+html[data-theme="light"] .term-line.ok { color: #3c7a00; }
+html[data-theme="light"] .term-line.dim { color: #7a8075; }
+html[data-theme="light"] .term-line[data-prompt]::before { color: #a0a59b; }
+html[data-theme="light"] .term .caret { background: #2a2d27; }
+html[data-theme="light"] .term-line[data-badge]:not(:empty)::after { border-color: rgba(118, 185, 0, 0.55); color: #3f6f00; }
+html[data-theme="light"] .lane-base .lane-status { background: rgba(229, 72, 77, 0.1); color: #c43d3d; }
+html[data-theme="light"] .lane-mid .lane-status { background: rgba(118, 185, 0, 0.12); color: #3f6f00; border-color: rgba(118, 185, 0, 0.5); }
 /* ---------- Bands ---------- */
 .band-green {
   --text: #121212;
