@@ -1418,7 +1418,7 @@
       'zs|N = 8': [null, 8, 17, 'start'],
       'dist|N = 4': [null, -9, -9, 'end'],
       'dist|N = 8': [null, -9, -9, 'end'],
-      'distbot|': ['Distilled + Best-of-3', -12, 4, 'end']
+      'distbot|': ['Mid-Harness (Distilled) + T = 3', -12, 4, 'end']
     };
     function find(key, tag) { return D.filter(function (r) { return r.key === key && r.tag === tag; })[0]; }
     var bot5 = find('bot', 'T = 5');
