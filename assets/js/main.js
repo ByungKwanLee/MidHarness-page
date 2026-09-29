@@ -613,8 +613,25 @@
       midSteps.forEach(function (li) { stepRO.observe(li.lastElementChild); });
     }
 
+    // Stacked on phones, the standings sit far below the task, so the duels wait until they are on screen.
+    var boardSeen = !hasIO;
+    var held = null;
     function later(ms, fn) { timers.push(setTimeout(fn, ms)); }
-    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; held = null; }
+    function whenBoardSeen(fn) {
+      if (boardSeen) fn();
+      else held = fn;
+    }
+    if (hasIO && board) {
+      new IntersectionObserver(function (entries) {
+        boardSeen = entries[entries.length - 1].intersectionRatio >= 0.6;
+        if (boardSeen && held) {
+          var fn = held;
+          held = null;
+          later(300, fn);
+        }
+      }, { threshold: [0, 0.6] }).observe(board);
+    }
 
     // Standings after the first k duels: won/lost counts, margin-weighted win rate.
     function standAt(k) {
@@ -803,14 +820,16 @@
       var pace = k ? 0.8 : 1;
       later(350, function () { phase(1); holdTurn(R.turn); });
       later(350 + 1850 * pace, function () {
-        phase(2);
-        var settle = playDuels(pace);
-        later(settle + 900 * pace, function () {
-          phase(3);
-          runTurns(R.turn, function () {
-            if (k + 1 < rounds.length) { later(600, function () { nextRound(k + 1); }); return; }
-            phase(4);
-            later(6000, function () { clearSteps(); later(450, function () { play(true); }); });
+        whenBoardSeen(function () {
+          phase(2);
+          var settle = playDuels(pace);
+          later(settle + 900 * pace, function () {
+            phase(3);
+            runTurns(R.turn, function () {
+              if (k + 1 < rounds.length) { later(600, function () { nextRound(k + 1); }); return; }
+              phase(4);
+              later(6000, function () { clearSteps(); later(450, function () { play(true); }); });
+            });
           });
         });
       });
@@ -883,10 +902,14 @@
     if (!hasIO || reduceMotion) { showFinal(); return; }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting && !running) { running = true; play(); }
+        // A phone-tall stage may never show 30% of itself at once; half a screen of it also counts.
+        // rootBounds is null inside cross-origin frames.
+        var vh = entry.rootBounds ? entry.rootBounds.height : window.innerHeight;
+        var seen = entry.intersectionRatio >= 0.3 || entry.intersectionRect.height >= vh * 0.5;
+        if (entry.isIntersecting && seen && !running) { running = true; play(); }
         if (!entry.isIntersecting && running) { running = false; clearTimers(); }
       });
-    }, { threshold: 0.3 });
+    }, { threshold: [0, 0.1, 0.2, 0.3] });
     io.observe(stage);
   }
 

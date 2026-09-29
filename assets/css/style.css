@@ -2644,10 +2644,14 @@ html[data-theme="dark"] .race-viz {
   .open-prob { grid-template-columns: 1fr; }
   .op-examples { grid-template-columns: 1fr; }
   .op-stat { padding: 20px 0 0; border-left: 0; border-top: 1px solid rgba(255, 255, 255, 0.14); border-image: none; }
-  .tl-spot .race { margin-top: 0; }
+  .tl-spot .race { margin-top: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  /* Every step of the turning border repaints the whole card; phones step about 15 times a second instead of every frame. */
+  .col, .tl-spot, .open-prob { animation-timing-function: steps(180); }
   .glyph { position: absolute; top: 0; right: 0; margin: 0; width: 46px; height: 46px; font-size: 25px; }
   .glyph.mono-g { font-size: 17px; }
   .stage-grid { grid-template-columns: 1fr; }
+  /* Stacked, the base lane is read while the duels below wait for the reader, so its skip note shows early. */
+  .stage.p1 .no-verify { opacity: 1; }
   .stage-fork { display: none; }
   .stage-task { margin-bottom: 14px; }
   .duo { grid-template-columns: 1fr; }
