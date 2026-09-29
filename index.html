@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260930a">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260930b">
 
   <script>
     (function () {
@@ -270,11 +270,10 @@
                   <div class="term-line err">========== 1 error in 0.21s ==========</div>
                   <div class="term-line" data-turn="2" data-type="pip install yaml" data-prompt="agent$"></div>
                   <div class="term-line err" data-turn="2" data-type="ERROR: No matching distribution found for yaml"></div>
-                  <div class="term-line" data-turn="3" data-type="pytest" data-prompt="agent$"></div>
-                  <div class="term-line err" data-turn="3" data-type="ModuleNotFoundError: No module named 'yaml'"></div>
-                  <div class="term-line err" data-turn="3" data-type="========== 1 error in 0.21s =========="></div>
+                  <div class="term-line" data-turn="3" data-type="conda install yaml" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="3" data-type="bash: conda: command not found"></div>
                 </div>
-                <span class="lane-status">✗ Error compounds · tests still fail</span>
+                <span class="lane-status">✗ Error compounds · yaml still missing</span>
               </div>
             </article>
 
@@ -679,8 +678,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260930a" defer></script>
-  <script src="assets/js/charts.js?v=20260930a" defer></script>
-  <script src="assets/js/main.js?v=20260930a" defer></script>
+  <script src="assets/js/data.js?v=20260930b" defer></script>
+  <script src="assets/js/charts.js?v=20260930b" defer></script>
+  <script src="assets/js/main.js?v=20260930b" defer></script>
 </body>
 </html>
