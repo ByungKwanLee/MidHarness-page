@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260929x">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929z">
 
   <script>
     (function () {
@@ -231,7 +231,7 @@
 
           <div class="stage-task">
             <span class="st-who"><span class="st-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>User task</span>
-            <p class="st-goal"><span class="visually-hidden">Run this repo's test suite and report whether it passes.</span><span id="stage-goal" aria-hidden="true">Run this repo's test suite and report whether it passes.</span></p>
+            <p class="st-goal"><span class="visually-hidden">Make this repo's test suite pass.</span><span id="stage-goal" aria-hidden="true">Make this repo's test suite pass.</span></p>
           </div>
           <div class="stage-fork" aria-hidden="true"><i></i><i></i></div>
 
@@ -270,10 +270,12 @@
                   <div class="term-line" data-turn="2" data-type="npm test" data-prompt="agent$"></div>
                   <div class="term-line err" data-turn="2" data-type="npm error code ENOENT"></div>
                   <div class="term-line err" data-turn="2" data-type="npm error Could not read package.json"></div>
-                  <div class="term-line" data-turn="3" data-type="echo FAIL" data-prompt="agent$"></div>
-                  <div class="term-line err" data-turn="3" data-type="FAIL"></div>
+                  <div class="term-line" data-turn="3" data-type="npm init -y" data-prompt="agent$"></div>
+                  <div class="term-line dim" data-turn="3" data-type="Wrote to /app/package.json"></div>
+                  <div class="term-line" data-turn="4" data-type="npm test" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="4" data-type="Error: no test specified"></div>
                 </div>
-                <span class="lane-status">✗ Error compounds · wrong report</span>
+                <span class="lane-status">✗ Error compounds · tests never run</span>
               </div>
             </article>
 
@@ -309,12 +311,14 @@
                   <div class="term-line vd" data-turn="1" data-prompt="agent$" data-badge><span class="ps">agent$</span> ls</div>
                   <div class="term-line">src/  tests/  pyproject.toml  pytest.ini</div>
                   <div class="term-line" data-turn="2" data-type="pytest" data-prompt="agent$" data-badge></div>
-                  <div class="term-line dim" data-turn="2" data-type="collected 12 items"></div>
-                  <div class="term-line ok" data-turn="2" data-type="========= 12 passed in 0.84s ========="></div>
-                  <div class="term-line" data-turn="3" data-type="echo PASS" data-prompt="agent$" data-badge></div>
-                  <div class="term-line ok" data-turn="3" data-type="PASS"></div>
+                  <div class="term-line err" data-turn="2" data-type="ModuleNotFoundError: No module named 'yaml'"></div>
+                  <div class="term-line err" data-turn="2" data-type="========== 1 error in 0.21s =========="></div>
+                  <div class="term-line" data-turn="3" data-type="pip install pyyaml" data-prompt="agent$" data-badge></div>
+                  <div class="term-line dim" data-turn="3" data-type="Successfully installed PyYAML-6.0.2"></div>
+                  <div class="term-line" data-turn="4" data-type="pytest" data-prompt="agent$" data-badge></div>
+                  <div class="term-line ok" data-turn="4" data-type="========= 12 passed in 0.84s ========="></div>
                 </div>
-                <span class="lane-status">✓ Verified every turn · correct report</span>
+                <span class="lane-status">✓ Verified every turn · 12 tests pass</span>
               </div>
             </article>
           </div>
@@ -404,8 +408,8 @@
             <p class="visually-hidden">Schematic: a verifier that writes out its reasoning and a verifier that answers with one token compare the same two actions and pick the same one.</p>
             <div class="race-viz" aria-hidden="true">
               <div class="rc-lane rc-think">
-                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>With reasoning</span><span class="rc-count"><b>51</b> <small>tokens</small></span></div>
-                <p class="rc-text">The goal is to run the test suite and report the result. A reinstalls the package in editable mode, which may help later but runs no tests. B runs the suite directly, and pytest.ini shows pytest is already configured. Scores: A 7, B 8. Preference: B</p>
+                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>With reasoning</span><span class="rc-count"><b>48</b> <small>tokens</small></span></div>
+                <p class="rc-text">The goal is to make the test suite pass. A reinstalls the package in editable mode, which may help later but runs no tests. B runs the suite directly, and pytest.ini shows pytest is already configured. Scores: A 7, B 8. Preference: B</p>
                 <p class="rc-verdict"><b>B</b><code>pytest</code></p>
                 <span class="rc-bar"></span>
               </div>
@@ -678,8 +682,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260929x" defer></script>
-  <script src="assets/js/charts.js?v=20260929x" defer></script>
-  <script src="assets/js/main.js?v=20260929x" defer></script>
+  <script src="assets/js/data.js?v=20260929z" defer></script>
+  <script src="assets/js/charts.js?v=20260929z" defer></script>
+  <script src="assets/js/main.js?v=20260929z" defer></script>
 </body>
 </html>

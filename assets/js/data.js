@@ -122,20 +122,21 @@ window.MH_DATA = (function () {
       ]
     },
 
-    // The overview's next decided turn, once the tests have passed: candidates for the report.
-    // Same schematic ring + pivot format as `demo`; the pivot stage assumes the ring's top four are 0, 2, 3 and 7.
+    // The overview's next decided turn, once pytest has shown `No module named 'yaml'`: candidates for the fix,
+    // with traps (the pip package is pyyaml) and shortcuts that hide the failure.
+    // Same schematic ring + pivot format as `demo`; the pivot stage assumes the ring's top four are 2, 3, 5 and 7.
     demoNext: {
-      candidates: ['pytest -v', 'echo FAIL', 'cat pytest.ini', 'echo PASS', 'git status', 'pytest --lf', 'npm test', 'ls tests/'],
-      choice: 3,
+      candidates: ['pip install yaml', 'pytest || true', 'pip install pyyaml', 'cat pyproject.toml', 'rm tests/test_config.py', 'pip install -e .', 'conda install yaml', 'apt install python3-yaml'],
+      choice: 2,
       ringDuels: 8,
       pivots: 4,
       duels: [
-        [0, 5, 7, 5], [5, 3, 4, 9], [3, 6, 9, 2], [6, 2, 2, 5],
-        [2, 7, 5, 4], [7, 1, 4, 1], [1, 4, 1, 4], [4, 0, 3, 7],
-        [1, 0, 1, 7], [1, 2, 2, 5], [1, 3, 1, 9], [4, 2, 4, 5],
-        [4, 3, 3, 9], [4, 7, 4, 3], [5, 2, 6, 4], [5, 7, 6, 3],
-        [6, 0, 2, 7], [6, 7, 2, 4], [0, 2, 7, 4], [0, 3, 7, 9],
-        [0, 7, 8, 3], [2, 3, 4, 9], [3, 7, 9, 3]
+        [0, 5, 3, 8], [5, 3, 8, 6], [3, 6, 6, 2], [6, 2, 2, 9],
+        [2, 7, 9, 5], [7, 1, 6, 2], [1, 4, 2, 1], [4, 0, 1, 3],
+        [0, 2, 2, 9], [0, 3, 4, 6], [0, 7, 4, 5], [1, 2, 2, 9],
+        [1, 3, 3, 6], [1, 5, 2, 8], [4, 2, 1, 9], [4, 3, 1, 6],
+        [4, 5, 1, 8], [4, 7, 1, 5], [6, 5, 2, 8], [6, 7, 3, 5],
+        [5, 7, 8, 4], [3, 7, 6, 5], [2, 3, 9, 6], [2, 5, 9, 8]
       ]
     }
   };

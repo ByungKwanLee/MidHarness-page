@@ -2713,11 +2713,12 @@ html[data-theme="dark"] .race-viz {
   .footer-row { flex-direction: column; align-items: flex-start; }
   .crop::before { --l: 9px; }
   .stage { border-radius: 18px; }
-  .shead, .srow { grid-template-columns: minmax(0, 1fr) 58px 34px; gap: 8px; }
-  .srow .sbar { display: none; }
-  .srow .rec, .shead span:nth-child(2) { text-align: left; }
+  /* The W/L record would leave commands about 13 characters; phones show the full command and the win rate. */
+  .shead, .srow { grid-template-columns: minmax(0, 1fr) 34px; gap: 8px; }
+  .srow .sbar, .srow .rec, .shead span:nth-child(2) { display: none; }
+  .srow code { white-space: normal; overflow-wrap: anywhere; }
   .shead { letter-spacing: 0.05em; }
-  .shead span:last-child { display: flex; justify-content: flex-end; white-space: nowrap; }
+  .shead span:last-child { grid-column: 2; display: flex; justify-content: flex-end; white-space: nowrap; }
   .stage-task { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
   .stage-top { font-size: 10.5px; letter-spacing: 0.08em; }
   .stage-top .live { min-width: 0; }
