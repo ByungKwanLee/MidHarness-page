@@ -2537,7 +2537,13 @@ html[data-theme="dark"] .race-viz {
 .slide-note { margin-top: 12px; font-size: 0.88rem; line-height: 1.55; color: var(--text-3); }
 @media (min-width: 761px) {
   .slides-nav { position: absolute; z-index: 2; top: clamp(18px, 2.6vw, 30px); right: clamp(18px, 2.6vw, 30px); flex-direction: row; margin: 0; }
-  .cost-slider .chart-head { padding-right: 330px; }
+  .cost-slider .chart-head { padding-right: 370px; }
+}
+@media (max-width: 480px) {
+  .slides-nav { flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+  .slides-nav .seg { display: grid; grid-template-columns: 1fr 1fr; }
+  .slides-nav .seg button { padding: 0 8px; }
+  .slides-hint { justify-content: center; }
 }
 .cost-wins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
 .cost-win { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-2); }
