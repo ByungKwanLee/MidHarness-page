@@ -102,32 +102,15 @@ window.MH_DATA = (function () {
       ]
     },
 
-    // Illustrative example for the overview and verification diagrams (schematic, not measured):
-    // eight candidates for one step, independent pointwise scores, and a ring + pivot pairwise
-    // tournament with N = 8 and K = 4 pivots. Duels are [i, j, score_i, score_j]; the first
-    // `ringDuels` follow the seeded ring, the rest form the pivot stage.
+    // Illustrative example for the overview and verification diagrams (schematic, not measured): the tests fail
+    // with `No module named 'yaml'`, and the eight candidate fixes include traps (the pip package is pyyaml) and
+    // shortcuts that hide the failure. Independent pointwise scores, and a ring + pivot pairwise tournament with
+    // N = 8 and K = 4 pivots. Duels are [i, j, score_i, score_j]; the first `ringDuels` follow the seeded ring,
+    // the rest form the pivot stage, which assumes the ring's top four are 2, 3, 5 and 7.
     demo: {
-      candidates: ['npm test', 'make test', 'pytest', 'cat pytest.ini', 'ls tests/', 'pip install -e .', 'python -m unittest', 'yarn test'],
+      candidates: ['pip install yaml', 'pytest || true', 'pip install pyyaml', 'cat pyproject.toml', 'rm -rf tests/', 'pip install -e .', 'conda install yaml', 'grep -rn yaml src/'],
       choice: 2,
-      pointScores: [2, 3, 9, 6, 5, 8, 4, 1],
-      ringDuels: 8,
-      pivots: 4,
-      duels: [
-        [0, 4, 2, 5], [4, 2, 4, 9], [2, 7, 9, 1], [7, 1, 2, 4],
-        [1, 5, 3, 7], [5, 3, 7, 6], [3, 6, 6, 4], [6, 0, 5, 2],
-        [0, 2, 1, 9], [0, 3, 2, 6], [0, 5, 2, 7], [1, 2, 3, 9],
-        [1, 3, 3, 6], [1, 6, 4, 5], [4, 3, 5, 6], [4, 5, 4, 7],
-        [4, 6, 5, 4], [7, 3, 1, 6], [7, 5, 1, 7], [7, 6, 2, 5],
-        [5, 6, 7, 4], [2, 6, 9, 4], [2, 3, 9, 6], [2, 5, 8, 7]
-      ]
-    },
-
-    // The overview's next decided turn, once pytest has shown `No module named 'yaml'`: candidates for the fix,
-    // with traps (the pip package is pyyaml) and shortcuts that hide the failure.
-    // Same schematic ring + pivot format as `demo`; the pivot stage assumes the ring's top four are 2, 3, 5 and 7.
-    demoNext: {
-      candidates: ['pip install yaml', 'pytest || true', 'pip install pyyaml', 'cat pyproject.toml', 'rm tests/test_config.py', 'pip install -e .', 'conda install yaml', 'apt install python3-yaml'],
-      choice: 2,
+      pointScores: [4, 2, 9, 6, 1, 8, 3, 5],
       ringDuels: 8,
       pivots: 4,
       duels: [
@@ -140,9 +123,9 @@ window.MH_DATA = (function () {
       ]
     },
 
-    // The turn after the fix: rerun the whole suite, or stop early, check only part of it, or repeat the install.
-    // Same format; the pivot stage assumes the ring's top four are 0, 2, 3 and 5.
-    demoLast: {
+    // The overview's next decided turn, after the fix: rerun the whole suite, or stop early, check only part of it,
+    // or repeat the install. Same format; the pivot stage assumes the ring's top four are 0, 2, 3 and 5.
+    demoNext: {
       candidates: ['pytest', 'git commit -am "fix"', 'pip show pyyaml', 'pytest -k config', 'pip install pyyaml', 'pytest -x -q', 'pip freeze', 'cat src/config.py'],
       choice: 0,
       ringDuels: 8,

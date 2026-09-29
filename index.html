@@ -34,7 +34,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="assets/css/style.css?v=20260929z3">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929z6">
 
   <script>
     (function () {
@@ -231,7 +231,7 @@
 
           <div class="stage-task">
             <span class="st-who"><span class="st-av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></span>User task</span>
-            <p class="st-goal"><span class="visually-hidden">Make this repo's test suite pass.</span><span id="stage-goal" aria-hidden="true">Make this repo's test suite pass.</span></p>
+            <p class="st-goal"><span class="visually-hidden">The tests fail: No module named 'yaml'. Make them pass.</span><span id="stage-goal" aria-hidden="true">The tests fail: No module named 'yaml'. Make them pass.</span></p>
           </div>
           <div class="stage-fork" aria-hidden="true"><i></i><i></i></div>
 
@@ -246,7 +246,7 @@
                     <span class="lstep-num">01</span>
                     <div>
                       <div class="lstep-head"><b>Sample</b><span class="mono"><i>π</i>(·|h<sub class="ht">t</sub>) × 1</span></div>
-                      <div class="chips"><span class="chip" style="--i:0"><span class="ps">$</span>npm test</span></div>
+                      <div class="chips"><span class="chip" style="--i:0"><span class="ps">$</span>pip install yaml</span></div>
                     </div>
                   </li>
                   <li class="lstep" data-step="2">
@@ -260,22 +260,20 @@
                     <span class="lstep-num">03</span>
                     <div>
                       <div class="lstep-head"><b>Execute</b><span class="mono">harness → environment</span></div>
-                      <div class="exec-row"><span class="chip"><span class="ps">$</span>npm test</span><span class="arrow">→ runs in the env</span></div>
+                      <div class="exec-row"><span class="chip"><span class="ps">$</span>pip install yaml</span><span class="arrow">→ runs in the env</span></div>
                     </div>
                   </li>
                 </ol>
                 <div class="term" aria-hidden="true">
                   <div class="term-line" data-turn="1" data-prompt="agent$"><span class="ps">agent$</span> ls</div>
                   <div class="term-line">src/  tests/  pyproject.toml  pytest.ini</div>
-                  <div class="term-line" data-turn="2" data-type="npm test" data-prompt="agent$"></div>
-                  <div class="term-line err" data-turn="2" data-type="npm error code ENOENT"></div>
-                  <div class="term-line err" data-turn="2" data-type="npm error Could not read package.json"></div>
-                  <div class="term-line" data-turn="3" data-type="npm init -y" data-prompt="agent$"></div>
-                  <div class="term-line dim" data-turn="3" data-type="Wrote to /app/package.json"></div>
-                  <div class="term-line" data-turn="4" data-type="npm test" data-prompt="agent$"></div>
-                  <div class="term-line err" data-turn="4" data-type="Error: no test specified"></div>
+                  <div class="term-line" data-turn="2" data-type="pip install yaml" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="2" data-type="ERROR: No matching distribution found for yaml"></div>
+                  <div class="term-line" data-turn="3" data-type="pytest" data-prompt="agent$"></div>
+                  <div class="term-line err" data-turn="3" data-type="ModuleNotFoundError: No module named 'yaml'"></div>
+                  <div class="term-line err" data-turn="3" data-type="========== 1 error in 0.21s =========="></div>
                 </div>
-                <span class="lane-status">✗ Error compounds · tests never run</span>
+                <span class="lane-status">✗ Error compounds · tests still fail</span>
               </div>
             </article>
 
@@ -303,20 +301,17 @@
                     <span class="lstep-num">03</span>
                     <div>
                       <div class="lstep-head"><b>Execute one</b><span class="mono">others discarded</span></div>
-                      <div class="exec-row"><span class="chip"><span class="ps">$</span>pytest</span><span class="arrow">→ runs in the env</span></div>
+                      <div class="exec-row"><span class="chip"><span class="ps">$</span>pip install pyyaml</span><span class="arrow">→ runs in the env</span></div>
                     </div>
                   </li>
                 </ol>
                 <div class="term" aria-hidden="true">
                   <div class="term-line vd" data-turn="1" data-prompt="agent$" data-badge><span class="ps">agent$</span> ls</div>
                   <div class="term-line">src/  tests/  pyproject.toml  pytest.ini</div>
-                  <div class="term-line" data-turn="2" data-type="pytest" data-prompt="agent$" data-badge></div>
-                  <div class="term-line err" data-turn="2" data-type="ModuleNotFoundError: No module named 'yaml'"></div>
-                  <div class="term-line err" data-turn="2" data-type="========== 1 error in 0.21s =========="></div>
-                  <div class="term-line" data-turn="3" data-type="pip install pyyaml" data-prompt="agent$" data-badge></div>
-                  <div class="term-line dim" data-turn="3" data-type="Successfully installed PyYAML-6.0.2"></div>
-                  <div class="term-line" data-turn="4" data-type="pytest" data-prompt="agent$" data-badge></div>
-                  <div class="term-line ok" data-turn="4" data-type="========= 12 passed in 0.84s ========="></div>
+                  <div class="term-line" data-turn="2" data-type="pip install pyyaml" data-prompt="agent$" data-badge></div>
+                  <div class="term-line dim" data-turn="2" data-type="Successfully installed PyYAML-6.0.2"></div>
+                  <div class="term-line" data-turn="3" data-type="pytest" data-prompt="agent$" data-badge></div>
+                  <div class="term-line ok" data-turn="3" data-type="========= 12 passed in 0.84s ========="></div>
                 </div>
                 <span class="lane-status">✓ Verified every turn · 12 tests pass</span>
               </div>
@@ -398,7 +393,7 @@
                 <span class="race-label">One duel · two verifiers</span>
                 <span class="race-cand"><b>A</b><code>pip install -e .</code></span>
                 <span class="race-vs">vs</span>
-                <span class="race-cand"><b>B</b><code>pytest</code></span>
+                <span class="race-cand"><b>B</b><code>pip install pyyaml</code></span>
               </p>
               <button class="mech-replay" type="button" id="race-replay">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
@@ -408,9 +403,9 @@
             <p class="visually-hidden">Schematic: a verifier that writes out its reasoning and a verifier that answers with one token compare the same two actions and pick the same one.</p>
             <div class="race-viz" aria-hidden="true">
               <div class="rc-lane rc-think">
-                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>With reasoning</span><span class="rc-count"><b>48</b> <small>tokens</small></span></div>
-                <p class="rc-text">The goal is to make the test suite pass. A reinstalls the package in editable mode, which may help later but runs no tests. B runs the suite directly, and pytest.ini shows pytest is already configured. Scores: A 7, B 8. Preference: B</p>
-                <p class="rc-verdict"><b>B</b><code>pytest</code></p>
+                <div class="rc-head"><span class="rc-name"><span class="rc-dot"></span>With reasoning</span><span class="rc-count"><b>42</b> <small>tokens</small></span></div>
+                <p class="rc-text">The goal is to make the tests pass. A reinstalls the project, which helps only if pyproject.toml lists yaml. B installs the missing module directly; its pip name is pyyaml. Scores: A 7, B 8. Preference: B</p>
+                <p class="rc-verdict"><b>B</b><code>pip install pyyaml</code></p>
                 <span class="rc-bar"></span>
               </div>
               <div class="rc-lane rc-one">
@@ -420,7 +415,7 @@
                   <p class="rc-prob"><span>p(A)</span><i style="--p: 0.31"></i><b>0.31</b></p>
                   <p class="rc-prob is-pick"><span>p(B)</span><i style="--p: 0.69"></i><b>0.69</b></p>
                 </div>
-                <p class="rc-verdict"><b>B</b><code>pytest</code></p>
+                <p class="rc-verdict"><b>B</b><code>pip install pyyaml</code></p>
                 <span class="rc-bar" style="--f: 0.02"></span>
               </div>
             </div>
@@ -682,8 +677,8 @@
 
   <div class="chart-tip" id="chart-tip" role="tooltip"></div>
 
-  <script src="assets/js/data.js?v=20260929z3" defer></script>
-  <script src="assets/js/charts.js?v=20260929z3" defer></script>
-  <script src="assets/js/main.js?v=20260929z3" defer></script>
+  <script src="assets/js/data.js?v=20260929z6" defer></script>
+  <script src="assets/js/charts.js?v=20260929z6" defer></script>
+  <script src="assets/js/main.js?v=20260929z6" defer></script>
 </body>
 </html>

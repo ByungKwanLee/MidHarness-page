@@ -544,9 +544,8 @@
     var M = window.MH_DATA || {};
     // Turns decided step by step: Mid-Harness candidates and the base agent's single sample.
     var rounds = [
-      { turn: 2, D: M.demo, base: 'npm test' },
-      { turn: 3, D: M.demoNext, base: 'npm init -y' },
-      { turn: 4, D: M.demoLast, base: 'npm test' }
+      { turn: 2, D: M.demo, base: 'pip install yaml' },
+      { turn: 3, D: M.demoNext, base: 'pytest' }
     ].filter(function (r) { return r.D; });
     var board = $('#stage-standings');
     var T = null;

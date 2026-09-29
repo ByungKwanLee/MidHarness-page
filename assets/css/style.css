@@ -2695,9 +2695,10 @@ html[data-theme="dark"] .race-viz {
   .race-viz { grid-template-columns: 1fr; gap: 12px; padding: 16px 12px; }
   .rc-lane { padding: 14px 14px 18px; }
   .mv-league .rh .id { display: none; }
-  .mv-league .rh code { display: inline-block; max-width: 58px; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px; }
+  .mv-league .rh code { display: inline-block; max-width: 90px; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px; }
   .mv-league .rh { width: 1%; padding-right: 4px; }
-  .mv-league thead th.ch { height: 108px; }
+  .mv-league-wrap { padding-right: 10px; }
+  .mv-league thead th.ch { height: 114px; }
   .mv-league th.ch .xl { font-size: 10px; transform: rotate(-62deg); }
   .mech-replay { height: 44px; padding: 0 14px; }
   .mv-league td.c { width: auto; height: 24px; font-size: 10.5px; }
