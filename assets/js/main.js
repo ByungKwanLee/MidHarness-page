@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  // Public links. Empty entries are shown as "soon" and are not clickable.
+  // Public links. Empty entries are shown as "soon" (or the link's data-soon text) and are not clickable.
   var PAGE_LINKS = {
     arxiv: '',
     code: ''
@@ -193,13 +193,14 @@
         a.rel = 'noopener';
         return;
       }
+      var soon = a.getAttribute('data-soon') || 'soon';
       a.classList.add('is-pending');
       a.setAttribute('aria-disabled', 'true');
-      a.title = 'Coming soon';
+      a.title = 'Coming ' + soon;
       if (a.classList.contains('pill')) {
         var tag = document.createElement('span');
         tag.className = 'soon';
-        tag.textContent = 'soon';
+        tag.textContent = soon;
         a.appendChild(tag);
       }
       a.addEventListener('click', function (e) { e.preventDefault(); });
