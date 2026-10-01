@@ -64,7 +64,7 @@ window.MH_DATA = (function () {
     ],
 
     // The same chart with one-token (decision-only) pairwise verification, from the paper's appendix figure.
-    // Points were read from the vector figure and match its tables to 0.05; base agent and Best-of-T are unchanged.
+    // Points were read from the vector figure and match its tables to 0.05; base agent and Best-of-T match `cost`.
     costJev: [
       { key: 'base', usd: 0.0443, pass1: 50.0 },
       { key: 'bot', tag: 'T = 3', usd: 0.3390, pass1: 55.10 },
