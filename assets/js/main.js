@@ -3,7 +3,7 @@
 
   // Public links. Empty entries are shown as "soon" (or the link's data-soon text) and are not clickable.
   var PAGE_LINKS = {
-    arxiv: '',
+    arxiv: 'https://arxiv.org/abs/2609.39982',
     code: ''
   };
 
