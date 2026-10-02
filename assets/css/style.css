@@ -1781,6 +1781,7 @@ html:not(.js) .mr-link::before {
 .mech-sum .mech-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 1rem; color: var(--text-2); animation: mv-sum-in 0.35s var(--ease-out); }
 .mech-sum .mech-panel[hidden] { display: none; }
 .mech-sum .mech-panel > b { font-weight: 700; color: var(--text); }
+.mech-sum .mech-panel em { font-style: normal; font-weight: 700; color: var(--accent); }
 .mech-sum i { font-family: var(--font-math); font-size: 1.08em; }
 .mech-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .mech-chips span { padding: 3px 10px; border: 1px solid var(--line-2); border-radius: 999px; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-2); white-space: nowrap; }
