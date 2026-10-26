@@ -1,10 +1,11 @@
 (function () {
   'use strict';
 
-  // Public links. Empty entries are shown as "soon" (or the link's data-soon text) and are not clickable.
+  // Public links. Empty entries are shown as "soon" (or the link's data-soon text) and are not clickable;
+  // a live pill with data-tag shows that label (the code release is internal to NVIDIA).
   var PAGE_LINKS = {
     arxiv: 'https://arxiv.org/abs/2609.39982',
-    code: ''
+    code: 'https://gitlab-master.nvidia.com/byungkwanl/mid-harness-dev'
   };
 
   var root = document.documentElement;
@@ -187,22 +188,25 @@
   function initLinks() {
     $$('[data-link]').forEach(function (a) {
       var url = PAGE_LINKS[a.getAttribute('data-link')];
+      function addTag(text) {
+        if (!a.classList.contains('pill') || !text) return;
+        var tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = text;
+        a.appendChild(tag);
+      }
       if (url) {
         a.href = url;
         a.target = '_blank';
         a.rel = 'noopener';
+        addTag(a.getAttribute('data-tag'));
         return;
       }
       var soon = a.getAttribute('data-soon') || 'soon';
       a.classList.add('is-pending');
       a.setAttribute('aria-disabled', 'true');
       a.title = 'Coming ' + soon;
-      if (a.classList.contains('pill')) {
-        var tag = document.createElement('span');
-        tag.className = 'soon';
-        tag.textContent = soon;
-        a.appendChild(tag);
-      }
+      addTag(soon);
       a.addEventListener('click', function (e) { e.preventDefault(); });
     });
   }

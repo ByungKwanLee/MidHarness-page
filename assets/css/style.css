@@ -410,7 +410,7 @@ html[data-theme="dark"] .theme-toggle .i-moon { display: none; }
 .pill:active { transform: translateY(1px); }
 .pill.is-pending { color: var(--text-3); cursor: default; }
 .pill.is-pending:hover { border-color: var(--line-2); background: var(--pill-bg); }
-.pill .soon {
+.pill .tag {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
